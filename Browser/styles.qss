@@ -1,0 +1,131 @@
+MainWindow#QUI-BrowserWindow {
+    background-color:#d3d3d3;
+}
+
+
+/*
+ * TabWidget
+ */
+TabWidget QTabBar::tab:disabled {
+    padding: 0px 0px 0px 0px;
+    margin: 0px 0px 0px 0px;
+    background-color:#d3d3d3;
+    width: 34px;
+    height:26px;
+}
+TabWidget QPushButton {
+    height:24px;
+    width:24px;
+    border-radius:12px
+}
+
+TabWidget QTabBar::tab {
+    padding: 0px 0px 0px 10px;
+    background-color:#d3d3d3;
+    height:30px;
+    border-top-left-radius: 6px;
+    border-top-right-radius: 6px;
+    border-left: 1px solid #C4C4C3;
+    max-width:160px;
+}
+
+TabWidget QTabBar::tab:selected {
+    background-color:#ffffff;
+}
+
+TabWidget QTabBar::tab:!selected {
+    height:28px;
+}
+
+TabWidget QPushButton:hover {
+    background-color: #C0C3C8;
+}
+
+
+TabWidget QTabBar::close-button {
+    image: url(icons:cross.png);
+    padding: 2px 2px 2px 2px;
+    margin: 3px 3px 3px 3px;
+    border-radius:6px;
+}
+TabWidget QTabBar::close-button:hover {
+    background-color: #C0C3C8;
+}
+
+
+/*
+ * NavigationBar
+ */
+NavigationBar QToolButton {
+    padding: 6px 6px 6px 6px;
+    width:14px;
+    height:14px;
+    border-radius:13px;
+}
+
+NavigationBar QToolButton:hover {
+    background-color: #EEEEEE;
+}
+
+NavigationBar QLineEdit {
+    border: 2px;
+    border-radius: 13px;
+    background-color: #EEEEEE;
+    height:28px;
+}
+
+NavigationBar QToolButton#MenuButton {
+    padding: 3px 3px 3px 3px;
+    width:18px;
+    height:18px;
+    border-radius:13px;
+}
+
+NavigationBar QToolButton#MenuButton::menu-indicator {
+    image: none
+}
+
+NavigationBar QToolButton#MenuButton {
+    image: url(icons:icon_more_vert.svg);
+}
+
+
+
+
+/*
+ * API
+ */
+
+/*
+ * DownloadTab
+ */
+DownloadManagerWidget {
+    background: #ffffff
+}
+
+DownloadManagerWidget QToolButton {
+    height: 60px;
+    min-width: 120px;
+}
+
+QToolButton::menu-indicator {
+    image: url(icons:icon_expand_less.svg);
+    subcontrol-position: right center;
+}
+
+DownloadManagerWidget QToolButton#ShowAll {
+    height: 18px;
+    width: 80px;
+    min-width: 80px;
+}
+
+DownloadManagerWidget QToolButton#Close {
+    min-width: 18px;
+    width: 18px;
+    height: 18px;
+}
+
+
+
+
+
