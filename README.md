@@ -10,7 +10,7 @@ It support 3D functionality in the core and can render it fast on any hardware.
 
 ## Downloads
 
-Coming soon
+Available on [Release](https://github.com/Toorion/qml-browser/releases) page
 
 ## Building
 
