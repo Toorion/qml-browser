@@ -48,6 +48,7 @@ public:
     void setLocationUrl(const QUrl url)
     {
         m_locationUrl->setUrl(url);
+        m_baseUrl = url;
     }
 
 

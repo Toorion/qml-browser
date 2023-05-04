@@ -42,7 +42,6 @@ public:
 
     QFileInfo uniqueFileName(QString path, QUrl url);
     DownloadItem *download(QUrl url);
-    QString syncDownload(QUrl url, const QUrl path);
     void setUserAgent(const QString userAgent);
 
     void setReloading(const bool reloading) {

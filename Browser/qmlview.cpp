@@ -127,9 +127,6 @@ void QmlView::continueLoad()
 
         connect(m_api->locationUrl(), &LocationUrl::urlChanged, this, &QmlView::urlChanged);
 
-        // todo Refactor
-        QQmlEngine::setObjectOwnership(m_api->qi()->visitHistoryModel(),QQmlEngine::CppOwnership);
-        QQmlEngine::setObjectOwnership(m_api->qi()->downloadHistoryModel(),QQmlEngine::CppOwnership);
         m_context->setContextObject(m_api);
 
         QObject *component = m_component->beginCreate(m_context);

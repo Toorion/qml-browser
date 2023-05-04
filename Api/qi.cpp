@@ -18,9 +18,9 @@
 ****************************************************************************/
 #include "qi.h"
 #include "apicommon.h"
-#include "downloaddb.h"
 #include "historyitemmodel.h"
 #include "dynamicobject.h"
+#include <QQmlEngine>
 
 QSettings *Qi::settings = nullptr;
 
@@ -29,36 +29,47 @@ Qi::Qi(QObject *parent) : QObject(parent)
 
 }
 
-
 DownloadItemModel *Qi::downloadHistoryModel()
 {
     ApiCommon *apiCommon = qobject_cast<ApiCommon*>(parent());
 
-    if(!apiCommon->accessRights()->allowDownloadsHistory) {
+    DownloadItemModel *model;
+    if(apiCommon->accessRights()->allowDownloadsHistory) {
+        model = m_downloadManagerWidget->downloadItemModel();
+    } else {
         apiCommon->console()->error("Access to download history deny");
-        return new DownloadItemModel();
+        model = new DownloadItemModel();
     }
-    return m_downloadManagerWidget->downloadItemModel();
+    QQmlEngine::setObjectOwnership(model, QQmlEngine::CppOwnership);
+    return model;
 }
 
 HistoryItemModel *Qi::visitHistoryModel()
 {
     ApiCommon *apiCommon = qobject_cast<ApiCommon*>(parent());
 
-    if(!apiCommon->accessRights()->allowVisitHitory) {
+    HistoryItemModel *model;
+    if(apiCommon->accessRights()->allowVisitHitory) {
+        model = &HistoryItemModel::instance();
+    } else {
         apiCommon->console()->error("Access to visit history deny");
-        return new HistoryItemModel(this);
+        model = new HistoryItemModel(this);
     }
-    return &HistoryItemModel::instance();
+    QQmlEngine::setObjectOwnership(model, QQmlEngine::CppOwnership);
+    return model;
 }
 
 QQmlPropertyMap *Qi::settingsModel()
 {
     ApiCommon *apiCommon = qobject_cast<ApiCommon*>(parent());
 
-    if(!apiCommon->accessRights()->allowSetings) {
+    DynamicObject *model;
+    if(apiCommon->accessRights()->allowSetings) {
+        model = new DynamicObject(Qi::settings, this);
+    } else {
         apiCommon->console()->error("Access to settings deny");
-        return new DynamicObject(new QObject(), this);
+        model = new DynamicObject(new QObject(), this);
     }
-    return new DynamicObject(Qi::settings, this);
+    QQmlEngine::setObjectOwnership(model, QQmlEngine::CppOwnership);
+    return model;
 }

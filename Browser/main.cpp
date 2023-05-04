@@ -83,6 +83,7 @@ int main(int argc, char *argv[])
 
     QCoreApplication::setOrganizationName("QbqBrowser");
 
+    //qputenv("QSG_RHI_BACKEND", "opengl");
     MainApplication app(argc, argv);
 
     //qputenv("QTWEBENGINE_CHROMIUM_FLAGS", "--disable-gpu --no-sandbox") ;

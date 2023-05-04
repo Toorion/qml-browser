@@ -114,59 +114,11 @@ DownloadItem *HttpManager::download(QUrl url)
 }
 
 
-QString HttpManager::syncDownload(QUrl url, const QUrl path)
-{
-    QFile *file = new QFile(path.toLocalFile());
-
-    // Trying to open the file
-    if (!file->open(QIODevice::WriteOnly))
-    {
-        delete file;
-        file = nullptr;
-        return nullptr;
-    }
-
-    QNetworkReply *reply = get(QNetworkRequest(url));
-
-    connect(reply, &QNetworkReply::readyRead, file, [=]() {
-        // If there is data and the file is open
-        if (file)
-        {
-            // write them to a file
-            file->write(reply->readAll());
-        }
-    });
-
-
-    QEventLoop loop;
-    connect(reply, &QNetworkReply::finished, &loop, [&loop, reply, file]() {
-        // by completion of the request
-        if (reply->error() == QNetworkReply::NoError)
-        {
-            // save file
-            file->flush();
-            file->close();
-        } else {
-            // Or delete it in case of error
-            file->remove();
-        }
-        loop.quit();
-    });
-
-    loop.exec();
-
-    delete file;
-    reply->close();
-    reply->deleteLater();
-    file = nullptr;
-
-    return path.toLocalFile();
-}
-
 void HttpManager::setUserAgent(const QString userAgent)
 {
     this->m_userAgent = userAgent;
 }
+
 
 QNetworkReply *HttpManager::createRequest(Operation op, const QNetworkRequest &request, QIODevice *outgoingData)
 {

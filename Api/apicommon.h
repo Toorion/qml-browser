@@ -56,6 +56,9 @@ public:
 signals:
     void requestDownload(const QString url);
 
+protected:
+    QUrl m_baseUrl;
+
 private:
     Console *m_console;
 

@@ -61,7 +61,12 @@ DownloadItem *ApiCommon::download(const QString url)
 
 QString ApiCommon::preload(const QString inputUrl)
 {
-    QUrl url = QUrl::fromUserInput(inputUrl);
+    QUrl url(inputUrl);
+    if(url.isRelative()) {
+        url = m_baseUrl.resolved(url);
+    } else {
+        url = QUrl::fromUserInput(inputUrl);
+    }
 
     QNetworkReply *reply = m_httpManager->get(QNetworkRequest(url));
 
@@ -72,6 +77,10 @@ QString ApiCommon::preload(const QString inputUrl)
     });
 
     loop.exec();
+
+    if(reply->error() != QNetworkReply::NoError) {
+        m_console->error(QLatin1String("File %1 load error").arg(url.toString()));
+    }
 
     reply->close();
     reply->deleteLater();
