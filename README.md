@@ -3,6 +3,7 @@
 QmlBrowser is full-featured Chromium based open-source web browser
 with QML pages support.
 
+![QmlBrowser is full-featured Chromium based open-source web browser with QML pages support](preview.png)
 
 is next generation of Web 3.0 browser.
 It use modern QML language to fill the pages with incredible features.

@@ -114,6 +114,7 @@ void QmlView::continueLoad()
             accessRights->allowAllInternalAccess();
         }
 
+        m_api->window()->setTab(this);
         m_api->setAccessRights(accessRights);
 
         connect(m_api->window(), &Window::newWindowRequested, [=] (const QUrl &url) {
