@@ -29,7 +29,7 @@ Kit QT + MSVC2019
 
 ## Demo
 
-[QML Demo page](http://qml.qbqsoft.com)
+[QML Demo page](http://demo.qbqsoft.com)
 
 \* Can only be opened using QmlBrowser
 
