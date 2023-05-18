@@ -27,6 +27,11 @@ make && make install
 Use QtCreator to build 
 Kit QT + MSVC2019
 
+## Demo
+
+[QML Demo page](http://qml.qbqsoft.com)
+
+\* Can only be opened using QmlBrowser
 
 ## Open QML pages
 
