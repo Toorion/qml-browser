@@ -53,10 +53,7 @@ import QtQuick3D.Audio
 import QtQuick3D.SpatialAudio
 
 
-import QtQuick.Window ?
-
-
-
+import QtQuick.Window
 
 import Qt3D.Core 2.4
 import Qt3D.Render 2.4
@@ -82,9 +79,9 @@ import Qt.labs.animation
 
 import QtMultimedia
 
-import QtDataVisualization
+// import QtDataVisualization - unstable
 
-import QtPositioning 6.4
+import QtPositioning
 
 import QtQml
 import QtQml.Models

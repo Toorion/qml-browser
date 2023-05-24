@@ -12,3 +12,4 @@ CONFIG += ordered
 unix:{
     QMAKE_LFLAGS += "-Wl,-rpath,\'\$$ORIGIN\'"
 }
+

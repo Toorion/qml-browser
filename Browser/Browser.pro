@@ -73,4 +73,5 @@ LIBS += -L$$OUT_PWD/../Net/ -lNet
 LIBS += -L$$OUT_PWD/../Api/ -lApi
 
 # https://forum.qt.io/topic/119599/qtwebengine-link-errors/5
-QMAKE_LFLAGS += -fuse-ld=gold
+# For QT6 not neccessary
+# QMAKE_LFLAGS += -fuse-ld=gold

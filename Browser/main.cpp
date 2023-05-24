@@ -33,6 +33,9 @@
 #include "dynamicobject.h"
 #include <QDir>
 #include <QTimer>
+#ifdef Q_OS_WIN
+#include <QQuickWindow>
+#endif
 
 
 void messageHandler(QtMsgType type, const QMessageLogContext &context, const QString &msg)
@@ -81,14 +84,19 @@ int main(int argc, char *argv[])
 {
     qInstallMessageHandler(&messageHandler);
 
-    QCoreApplication::setOrganizationName("QbqBrowser");
-
-    //qputenv("QSG_RHI_BACKEND", "opengl");
-    MainApplication app(argc, argv);
-
+    qputenv("QT_QUICK_CONTROLS_STYLE", "Basic");
     //qputenv("QTWEBENGINE_CHROMIUM_FLAGS", "--disable-gpu --no-sandbox") ;
     // For linux required
     qputenv("QTWEBENGINE_CHROMIUM_FLAGS", "--no-sandbox") ;
+
+    QCoreApplication::setOrganizationName("QbqBrowser");
+
+#ifdef Q_OS_WIN
+    // Fix shader loading on windows
+    QQuickWindow::setGraphicsApi(QSGRendererInterface::Direct3D11);
+#endif
+
+    MainApplication app(argc, argv);
 
     // Browser styles load
     QDir::setSearchPaths("icons", QStringList(BrowserPaths::iconsPath()));
