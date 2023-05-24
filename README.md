@@ -63,6 +63,7 @@ Telegram: [@qmlbrowser](https://t.me/qmlbrowser)
 
 ## ToDo
 
+- Page loading progressbar
 - Local data storage for QML pages
 - Network adapter for QML mode
 - Expand API model for QML pages
