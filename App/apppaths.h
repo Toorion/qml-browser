@@ -43,7 +43,13 @@ public:
 
     QString static dataPath();
 
+    QString static dbPath();
+
     QString static downloadPath();
+
+    QString static webAppPath(const QUrl &url);
+
+    QString static dappsPath(const uint &id);
 
     QString const iconsDir = QLatin1String("/icons");
 

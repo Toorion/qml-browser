@@ -18,7 +18,7 @@ import QtQuick.Timeline
 import QtTest
 
 // import QtRemoteObjects
-// import QtScxml
+import QtScxml
 // import QtSensors not for PC
 // import QtQml.StateMachine
 // import QtWebChannel 1.4 ?
@@ -89,3 +89,4 @@ import Qt.labs.qmlmodels
 import QtQml.WorkerScript
 
 import QtTextToSpeech
+import QtQuick3D.Physics.Helpers

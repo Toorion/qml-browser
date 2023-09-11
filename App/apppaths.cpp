@@ -22,6 +22,7 @@
 #include <QDir>
 #include <QRegularExpression>
 #include <QUrl>
+#include <QByteArray>
 
 Q_GLOBAL_STATIC(AppPaths, gs_app_paths)
 
@@ -89,23 +90,53 @@ QString AppPaths::dataPath()
     return p->m_dataPath;
 }
 
+QString AppPaths::dbPath()
+{
+    return dataPath();
+}
+
 QString AppPaths::downloadPath()
 {
     AppPaths* p = gs_app_paths();
     return p->m_downloadPath;
 }
 
+QString AppPaths::webAppPath(const QUrl &url)
+{
+    AppPaths* p = gs_app_paths();
+
+    QUrl cleanUrl;
+    cleanUrl.setScheme(url.scheme());
+    cleanUrl.setHost(url.host());
+
+    quint16 id = qChecksum(cleanUrl.toEncoded());
+    QString strId = QString::number(id, 16);
+
+    return p->m_cachePath + strId.left(2) + QLatin1Char('/') + strId.right(2) + QLatin1Char('/');
+}
+
+QString AppPaths::dappsPath(const uint &id)
+{
+    // todo
+    return dataPath() + QLatin1String("dapps/") + QString::number(id) + QLatin1Char('/');
+}
+
 void AppPaths::init()
 {
     m_appPath = QCoreApplication::applicationDirPath();
-    m_dataPath = QStandardPaths::writableLocation(QStandardPaths::AppDataLocation);
     m_currentProfilePath = QStandardPaths::writableLocation(QStandardPaths::AppConfigLocation);
-    m_cachePath = QStandardPaths::writableLocation(QStandardPaths::CacheLocation);
     m_downloadPath = QStandardPaths::writableLocation(QStandardPaths::DownloadLocation);
 
+    m_dataPath = QStandardPaths::writableLocation(QStandardPaths::AppDataLocation);
+    if (!m_dataPath.endsWith(QLatin1Char('/')))
+        m_dataPath += QLatin1Char('/');
     if (m_dataPath.isEmpty()) qFatal("Cannot determine settings storage location");
     QDir dataDir(m_dataPath);
     if(!dataDir.mkpath(dataDir.absolutePath())) {
         qFatal("wrong dataPath");
     }
+
+    m_cachePath = QStandardPaths::writableLocation(QStandardPaths::CacheLocation);
+    if (!m_cachePath.endsWith(QLatin1Char('/')))
+        m_cachePath += QLatin1Char('/');
 }

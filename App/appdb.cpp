@@ -32,7 +32,7 @@ AppDb::AppDb() : QObject()
 
 const QString AppDb::dbFullName()
 {
-    return QDir(AppPaths::dataPath()).filePath(m_dbName);
+    return QDir(AppPaths::dbPath()).filePath(m_dbName);
 }
 
 bool AppDb::connect()
@@ -65,7 +65,8 @@ void AppDb::close()
 
 bool AppDb::queryError(const QString command, const QString error)
 {
-    qWarning("DB Error, %s", m_tableName.data());
+    qWarning("DB Error, %s", dbFullName().toLocal8Bit().data());
+    qWarning("Table: %s", m_tableName.data());
     qWarning("Command: %s", command.toLocal8Bit().data());
     qWarning("With error: %s", error.toLocal8Bit().data());
     return false;

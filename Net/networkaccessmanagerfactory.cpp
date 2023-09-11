@@ -20,14 +20,12 @@
 #include <QNetworkAccessManager>
 #include "httpmanager.h"
 #include "networkdiskcache.h"
-#include "apppaths.h"
 
 QNetworkAccessManager *NetworkAccessManagerFactory::create(QObject *parent)
 {
     auto httpManager = new HttpManager(parent);
 
     auto cache = new NetworkDiskCache();
-    cache->setCacheDirectory(AppPaths::cachePath());
     cache->setMaximumCacheSize(m_maxCacheSize);
 
     httpManager->setCache(cache);

@@ -33,6 +33,7 @@
 #include "dynamicobject.h"
 #include <QDir>
 #include <QTimer>
+#include <QQuickStyle>
 #ifdef Q_OS_WIN
 #include <QQuickWindow>
 #endif
@@ -111,8 +112,11 @@ int main(int argc, char *argv[])
     QWebEngineProfile::defaultProfile()->settings()->setAttribute(QWebEngineSettings::DnsPrefetchEnabled, true);
 
     // Settings
-    Qi::settings = BrowserSettings::instance(BrowserPaths::currentProfilePath() + QLatin1String("/settings.ini"));
-    BrowserSettings::instance()->initDefaultUserAgent(QWebEngineProfile::defaultProfile()->httpUserAgent());
+    BrowserSettings *settings = BrowserSettings::instance(BrowserPaths::currentProfilePath() + QLatin1String("/settings.ini"));
+    Qi::settings = settings;
+    settings->initDefaultUserAgent(QWebEngineProfile::defaultProfile()->httpUserAgent());
+    QQuickStyle::setFallbackStyle("Basic");
+    QQuickStyle::setStyle(settings->appStyle());
 
     MainWindow *window = mainBrowser.createWindow();
     window->navigationBar->urlLineEdit->setFocus();

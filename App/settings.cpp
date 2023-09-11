@@ -21,6 +21,7 @@
 
 
 #define APP_GROUP QLatin1String("App")
+#define APP_DEFAULT_STYLE QLatin1String("Basic")
 
 Settings::Settings(const QString &fileName, Format format, QObject *parent)
     : QSettings(fileName, format, parent)
@@ -64,6 +65,26 @@ QString Settings::appCacheMaxSize()
     endGroup();
     return v;
 }
+
+void Settings::setAppStyle(QString value)
+{
+    beginGroup(APP_GROUP);
+    setValue("Style", value);
+    endGroup();
+}
+
+QString Settings::appStyle()
+{
+    beginGroup(APP_GROUP);
+    QString v = value("Style").toString();
+    if(v.isEmpty()) {
+        v = APP_DEFAULT_STYLE;
+    }
+    endGroup();
+    return v;
+}
+
+
 
 void Settings::initDefaultUserAgent(QString userAgent)
 {

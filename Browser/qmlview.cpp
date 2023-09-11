@@ -35,6 +35,7 @@
 #include <QVBoxLayout>
 #include <QQuick3D>
 #include <QApplication>
+#include "apppaths.h"
 
 QmlView::QmlView(QSplitter *splitter, QWidget *parent)
     : QWidget(parent)
@@ -87,6 +88,7 @@ void QmlView::setContent(const QByteArray &content, const QString &mimeType, con
 {
     (void)mimeType;
     m_url = baseUrl;
+
     m_api->setLocationUrl(m_url);
 
     m_component = new QQmlComponent(m_quickView->engine());
@@ -106,6 +108,9 @@ void QmlView::setContent(const QByteArray &content, const QString &mimeType, con
 void QmlView::continueLoad()
 {
     if(m_component->status() == QQmlComponent::Ready) {
+
+        // set LocalStorage path per host
+        m_qmlEngine.setOfflineStoragePath(AppPaths::webAppPath(m_url));
 
         m_context = new QQmlContext(m_quickView->engine()->rootContext());
 

@@ -74,24 +74,19 @@ public:
     NetworkDiskCachePrivate()
         : QAbstractNetworkCachePrivate()
         , maximumCacheSize(1024 * 1024 * 50)
-        , currentCacheSize(-1)
         {}
 
     static QString uniqueFileName(const QUrl &url, const QString &extension);
-    QString cacheHeaderFileName(const QUrl &url) const;
-    QString cacheFileName(const QUrl &url) const;
-    QString tmpHeaderFileName() const;
-    QString tmpCacheFileName(const QString &file) const;
+    QString cacheHeaderFileName(const QUrl &url);
+    QString cacheFileName(const QUrl &url);
+    QString tmpHeaderFileName(const QUrl &url);
+    QString tmpCacheFileName(const QUrl &url);
     bool removeFile(const QString &file);
     void storeItem(CacheItem *item);
-    void prepareLayout();
     static quint32 crc32(const char *data, uint len);
 
     mutable CacheItem lastItem;
-    QString cacheDirectory;
-    QString dataDirectory;
     qint64 maximumCacheSize;
-    qint64 currentCacheSize;
 
     QHash<QIODevice*, CacheItem*> inserting;
     Q_DECLARE_PUBLIC(NetworkDiskCache)

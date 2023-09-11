@@ -41,8 +41,8 @@ public:
 
     static NetworkDiskCache* instance();
 
-    QString cacheDirectory() const;
-    void setCacheDirectory(const QString &cacheDir);
+    QString cacheDirectory(const QUrl &url);
+    QString dataDirectory(const QUrl &url);
 
     qint64 maximumCacheSize() const;
     void setMaximumCacheSize(qint64 size);
@@ -65,7 +65,7 @@ public Q_SLOTS:
     void clear() override;
 
 protected:
-    virtual qint64 expire();
+//    virtual qint64 expire();
 
 private:
     Q_DECLARE_PRIVATE(NetworkDiskCache)

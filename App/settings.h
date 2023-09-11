@@ -27,6 +27,7 @@ class APP_EXPORT Settings : public QSettings
     Q_OBJECT
     Q_PROPERTY(QString appUserAgent READ appUserAgent WRITE setAppUserAgent NOTIFY appUserAgentChanged)
     Q_PROPERTY(QString appCacheMaxSize READ appCacheMaxSize WRITE setAppCacheMaxSize NOTIFY appCacheMaxSizeChanged)
+    Q_PROPERTY(QString appStyle READ appStyle WRITE setAppStyle NOTIFY appStyleChanged)
 public:
     explicit Settings(const QString &fileName, QSettings::Format format, QObject *parent = nullptr);
 
@@ -36,11 +37,15 @@ public:
     void setAppCacheMaxSize(QString value);
     QString appCacheMaxSize();
 
+    void setAppStyle(QString value);
+    QString appStyle();
+
     void initDefaultUserAgent(QString userAgent);
     QString defaultUserAgent();
 
 signals:
     void appUserAgentChanged(QString userAgent);
+    void appStyleChanged(QString style);
     void appCacheMaxSizeChanged(qint8 appCacheMaxSize);
 private:
     QString m_defaultUserAgent;

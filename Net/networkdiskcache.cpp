@@ -32,10 +32,12 @@
 #include <qurl.h>
 #include <qcryptographichash.h>
 #include <qdebug.h>
+#include "apppaths.h"
 
 #define CACHE_POSTFIX QLatin1String("d")
 #define PREPARED_SLASH QLatin1String("prepared/")
 #define CACHE_VERSION 1
+#define CACHE_DIR QLatin1String("cache")
 #define DATA_DIR QLatin1String("data")
 
 #define MAX_COMPRESSION_SIZE (1024 * 1024 * 3)
@@ -67,59 +69,29 @@ NetworkDiskCache *NetworkDiskCache::instance()
     return self;
 }
 
-/*!
-    Returns the location where cached files will be stored.
-*/
-QString NetworkDiskCache::cacheDirectory() const
+QString NetworkDiskCache::cacheDirectory(const QUrl &url)
 {
-    Q_D(const NetworkDiskCache);
-    return d->cacheDirectory;
+    QString cacheDirectory = AppPaths::webAppPath(url) + CACHE_DIR + QLatin1Char('/');
+    QDir helper;
+    helper.mkpath(cacheDirectory + PREPARED_SLASH);
+    return cacheDirectory;
 }
 
-/*!
-    Sets the directory where cached files will be stored to \a cacheDir
-
-    NetworkDiskCache will create this directory if it does not exists.
-
-    Prepared cache items will be stored in the new cache directory when
-    they are inserted.
-
-    \sa QDesktopServices::CacheLocation
-*/
-void NetworkDiskCache::setCacheDirectory(const QString &cacheDir)
+QString NetworkDiskCache::dataDirectory(const QUrl &url)
 {
-#if defined(NETWORKDISKCACHE_DEBUG)
-    qDebug() << "NetworkDiskCache::setCacheDirectory()" << cacheDir;
-#endif
-    Q_D(NetworkDiskCache);
-    if (cacheDir.isEmpty())
-        return;
-    d->cacheDirectory = cacheDir;
-    QDir dir(d->cacheDirectory);
-    d->cacheDirectory = dir.absolutePath();
-    if (!d->cacheDirectory.endsWith(QLatin1Char('/')))
-        d->cacheDirectory += QLatin1Char('/');
-
-    d->dataDirectory = d->cacheDirectory + DATA_DIR + QString::number(CACHE_VERSION) + QLatin1Char('/');
-    d->prepareLayout();
+    QString cacheDir = cacheDirectory(url) + DATA_DIR + QString::number(CACHE_VERSION) + QLatin1Char('/');
+    QDir helper;
+    helper.mkpath(cacheDir);
+    return cacheDir;
 }
+
 
 /*!
     \reimp
 */
 qint64 NetworkDiskCache::cacheSize() const
 {
-#if defined(NETWORKDISKCACHE_DEBUG)
-    qDebug("NetworkDiskCache::cacheSize()");
-#endif
-    Q_D(const NetworkDiskCache);
-    if (d->cacheDirectory.isEmpty())
-        return 0;
-    if (d->currentCacheSize < 0) {
-        NetworkDiskCache *that = const_cast<NetworkDiskCache*>(this);
-        that->d_func()->currentCacheSize = that->expire();
-    }
-    return d->currentCacheSize;
+    return 0; // todo check cache size per application
 }
 
 /*!
@@ -133,11 +105,6 @@ QIODevice *NetworkDiskCache::prepare(const QNetworkCacheMetaData &metaData)
     Q_D(NetworkDiskCache);
     if (!metaData.isValid() || !metaData.url().isValid() || !metaData.saveToDisk())
         return nullptr;
-
-    if (d->cacheDirectory.isEmpty()) {
-        qWarning("NetworkDiskCache::prepare() The cache directory is not set");
-        return nullptr;
-    }
 
     const auto headers = metaData.rawHeaders();
     for (const auto &header : headers) {
@@ -157,8 +124,8 @@ QIODevice *NetworkDiskCache::prepare(const QNetworkCacheMetaData &metaData)
         cacheItem->data.open(QBuffer::ReadWrite);
         device = &(cacheItem->data);
     } else {
-        QString headerTplName = d->tmpHeaderFileName();
-        QString templateName = d->tmpCacheFileName(metaData.url().fileName());
+        QString headerTplName = d->tmpHeaderFileName(cacheItem->metaData.url());
+        QString templateName = d->tmpCacheFileName(metaData.url());
         QT_TRY {
             cacheItem->headerFile = new QTemporaryFile(headerTplName, &cacheItem->headerData);
             cacheItem->file = new QTemporaryFile(templateName, &cacheItem->data);
@@ -204,33 +171,13 @@ void NetworkDiskCache::insert(QIODevice *device)
     d->inserting.erase(it);
 }
 
-
-/*!
-    Create subdirectories and other housekeeping on the filesystem.
-    Prevents too many files from being present in any single directory.
-*/
-void NetworkDiskCachePrivate::prepareLayout()
-{
-    QDir helper;
-    helper.mkpath(cacheDirectory + PREPARED_SLASH);
-
-    //Create directory and subdirectories 0-F
-    helper.mkpath(dataDirectory);
-    for (uint i = 0; i < 16 ; i++) {
-        QString str = QString::number(i, 16);
-        QString subdir = dataDirectory + str;
-        helper.mkdir(subdir);
-    }
-}
-
-
 void NetworkDiskCachePrivate::storeItem(CacheItem *cacheItem)
 {
 #if defined(NETWORKDISKCACHE_DEBUG)
     qDebug() << "NetworkDiskCachePrivate::storeItem()";
 #endif
 
-    Q_Q(NetworkDiskCache);
+//    Q_Q(NetworkDiskCache);
     Q_ASSERT(cacheItem->metaData.saveToDisk());
 
     QString headerFileName = cacheHeaderFileName(cacheItem->metaData.url());
@@ -251,12 +198,12 @@ void NetworkDiskCachePrivate::storeItem(CacheItem *cacheItem)
         }
     }
 
-    if (currentCacheSize > 0)
-        currentCacheSize += 1024 + cacheItem->size();
-    currentCacheSize = q->expire();
+//    if (currentCacheSize > 0)
+//        currentCacheSize += 1024 + cacheItem->size();
+//    currentCacheSize = q->expire();
 
     if (!cacheItem->headerFile) { // Only if canCompress
-        cacheItem->headerFile = new QTemporaryFile(tmpHeaderFileName(), &cacheItem->data);
+        cacheItem->headerFile = new QTemporaryFile(tmpHeaderFileName(cacheItem->metaData.url()), &cacheItem->data);
         if (cacheItem->headerFile->open()) {
             cacheItem->writeHeader(cacheItem->headerFile);
             cacheItem->writeCompressedData(cacheItem->headerFile);
@@ -269,7 +216,8 @@ void NetworkDiskCachePrivate::storeItem(CacheItem *cacheItem)
         cacheItem->headerFile->setAutoRemove(false);
         // ### use atomic rename rather then remove & rename
         if (cacheItem->headerFile->rename(headerFileName))
-            currentCacheSize += cacheItem->headerFile->size();
+//            currentCacheSize += cacheItem->headerFile->size();
+            ;
         else
             cacheItem->headerFile->setAutoRemove(true);
     }
@@ -279,7 +227,8 @@ void NetworkDiskCachePrivate::storeItem(CacheItem *cacheItem)
         cacheItem->file->setAutoRemove(false);
         // ### use atomic rename rather then remove & rename
         if (cacheItem->file->rename(fileName))
-            currentCacheSize += cacheItem->file->size();
+//            currentCacheSize += cacheItem->file->size();
+            ;
         else
             cacheItem->file->setAutoRemove(true);
     }
@@ -324,9 +273,9 @@ bool NetworkDiskCachePrivate::removeFile(const QString &file)
         return false;
     QFileInfo info(file);
     QString fileName = info.fileName();
-    qint64 size = info.size();
+//    qint64 size = info.size();
     if (QFile::remove(file)) {
-        currentCacheSize -= size;
+//        currentCacheSize -= size;
         return true;
     }
     return false;
@@ -466,17 +415,12 @@ qint64 NetworkDiskCache::maximumCacheSize() const
 /*!
     Sets the maximum size of the disk cache to be \a size.
 
-    If the new size is smaller then the current cache size then the cache will call expire().
-
     \sa maximumCacheSize()
  */
 void NetworkDiskCache::setMaximumCacheSize(qint64 size)
 {
     Q_D(NetworkDiskCache);
-    bool expireCache = (size < d->maximumCacheSize);
     d->maximumCacheSize = size;
-    if (expireCache)
-        d->currentCacheSize = expire();
 }
 
 /*!
@@ -497,6 +441,7 @@ void NetworkDiskCache::setMaximumCacheSize(qint64 size)
 
     \sa maximumCacheSize(), fileMetaData()
  */
+/*
 qint64 NetworkDiskCache::expire()
 {
     Q_D(NetworkDiskCache);
@@ -558,6 +503,7 @@ qint64 NetworkDiskCache::expire()
 #endif
     return totalSize;
 }
+*/
 
 /*!
     \reimp
@@ -567,10 +513,10 @@ void NetworkDiskCache::clear()
 #if defined(NETWORKDISKCACHE_DEBUG)
     qDebug("NetworkDiskCache::clear()");
 #endif
+    // todo Make clean per each site
     Q_D(NetworkDiskCache);
     qint64 size = d->maximumCacheSize;
     d->maximumCacheSize = 0;
-    d->currentCacheSize = expire();
     d->maximumCacheSize = size;
 }
 
@@ -587,53 +533,53 @@ QString NetworkDiskCachePrivate::uniqueFileName(const QUrl &url, const QString &
     hash.addData(cleanUrl.toEncoded());
     // convert sha1 to base36 form and return first 8 bytes for use as string
     const QByteArray id = QByteArray::number(*(qlonglong*)hash.result().constData(), 36).left(8);
-    // generates <one-char subdir>/<8-char filname.d>
-    uint code = (uint)id.at(id.length()-1) % 16;
-    QString pathFragment = QString::number(code, 16) + QLatin1Char('/')
-                             + QLatin1String(id) + QLatin1Char('.') + postfix;
-
-    return pathFragment;
+    return QLatin1String(id) + QLatin1Char('.') + postfix;
 }
 
 
-QString NetworkDiskCachePrivate::tmpHeaderFileName() const
+QString NetworkDiskCachePrivate::tmpHeaderFileName(const QUrl &url)
 {
+    Q_Q(NetworkDiskCache);
     //The subdirectory is presumed to be already read for use.
-    return cacheDirectory + PREPARED_SLASH + QLatin1String("XXXXXX.") + CACHE_POSTFIX;
+    return q->cacheDirectory(url) + PREPARED_SLASH + QLatin1String("XXXXXX.") + CACHE_POSTFIX;
 }
 
 
-QString NetworkDiskCachePrivate::tmpCacheFileName(const QString &file) const
+QString NetworkDiskCachePrivate::tmpCacheFileName(const QUrl &url)
 {
-    QFileInfo info(file);
+    Q_Q(NetworkDiskCache);
+    QFileInfo info(url.fileName());
     //The subdirectory is presumed to be already read for use.
-    return cacheDirectory + PREPARED_SLASH + QLatin1String("XXXXXX") + QLatin1Char('.') +
+    return q->cacheDirectory(url) + PREPARED_SLASH + QLatin1String("XXXXXX") + QLatin1Char('.') +
             (info.suffix().isEmpty() ? QLatin1String("z") : info.suffix());
 }
 
 /*!
     Generates fully qualified path of cached resource from a URL.
  */
-QString NetworkDiskCachePrivate::cacheHeaderFileName(const QUrl &url) const
+QString NetworkDiskCachePrivate::cacheHeaderFileName(const QUrl &url)
 {
+    Q_Q(NetworkDiskCache);
+
     if (!url.isValid())
         return QString();
 
-    return dataDirectory + uniqueFileName(url, CACHE_POSTFIX);
+    return q->dataDirectory(url) + uniqueFileName(url, CACHE_POSTFIX);
 }
 
 
 /*!
     Generates fully qualified path of cached resource from a URL.
  */
-QString NetworkDiskCachePrivate::cacheFileName(const QUrl &url) const
+QString NetworkDiskCachePrivate::cacheFileName(const QUrl &url)
 {
+    Q_Q(NetworkDiskCache);
     if (!url.isValid())
         return QString();
 
     QFileInfo info(url.fileName());
 
-    return dataDirectory + uniqueFileName(url, info.suffix());
+    return q->dataDirectory(url) + uniqueFileName(url, info.suffix());
 }
 
 /*!
