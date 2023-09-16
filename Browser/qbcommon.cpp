@@ -3,7 +3,7 @@
 namespace Qb
 {
 const char *APPNAME = "QmlBrowser";
-const char *VERSION = "0.1.2";
+const char *VERSION = "0.1.3";
 const char *AUTHOR = "Denis Solomatin";
 const char *COPYRIGHT = "2023";
 const char *WWWADDRESS = "";
