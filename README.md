@@ -31,6 +31,8 @@ Kit QT + MSVC2019
 
 [QML Demo page](http://demo.qbqsoft.com)
 
+[QML Demo source](https://github.com/Toorion/qml-browser-demo)
+
 \* Can only be opened using QmlBrowser
 
 ## Open QML pages
