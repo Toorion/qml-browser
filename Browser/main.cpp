@@ -34,9 +34,6 @@
 #include <QDir>
 #include <QTimer>
 #include <QQuickStyle>
-#ifdef Q_OS_WIN
-#include <QQuickWindow>
-#endif
 
 
 void messageHandler(QtMsgType type, const QMessageLogContext &context, const QString &msg)
@@ -85,17 +82,11 @@ int main(int argc, char *argv[])
 {
     qInstallMessageHandler(&messageHandler);
 
-    qputenv("QT_QUICK_CONTROLS_STYLE", "Basic");
     //qputenv("QTWEBENGINE_CHROMIUM_FLAGS", "--disable-gpu --no-sandbox") ;
     // For linux required
     qputenv("QTWEBENGINE_CHROMIUM_FLAGS", "--no-sandbox") ;
 
     QCoreApplication::setOrganizationName("QbqBrowser");
-
-#ifdef Q_OS_WIN
-    // Fix shader loading on windows
-    QQuickWindow::setGraphicsApi(QSGRendererInterface::Direct3D11);
-#endif
 
     MainApplication app(argc, argv);
 

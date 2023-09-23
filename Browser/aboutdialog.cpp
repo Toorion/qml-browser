@@ -5,6 +5,8 @@
 #include <QPushButton>
 #include <QWebEngineProfile>
 #include "browsersettings.h"
+#include <QQuickWindow>
+
 
 AboutDialog::AboutDialog(QWidget* parent) : QDialog(parent)
 {
@@ -19,6 +21,24 @@ AboutDialog::AboutDialog(QWidget* parent) : QDialog(parent)
     logoLabel->setText("<table><tr><td><img src=icons:qbqb.svg width=60 height=60></td><td style='padding-top:8px'><span style='height:1000px;font-size:40px;font-weight:bold;color:green;'>rowser</span></td></tr></table>");
     layout->addWidget(logoLabel, 0, Qt::AlignHCenter);
 
+    QString gApiName("Unknown");
+    auto gApi = QQuickWindow::graphicsApi();
+    if(QSGRendererInterface::GraphicsApi::Direct3D11 == gApi) {
+        gApiName = "Direct3D 11";
+    } else if(QSGRendererInterface::GraphicsApi::Metal == gApi) {
+        gApiName = "Metal";
+    } else if(QSGRendererInterface::GraphicsApi::Null == gApi) {
+        gApiName = "No graphic API";
+    } else if(QSGRendererInterface::GraphicsApi::OpenGL == gApi) {
+        gApiName = "OpenGL";
+    } else if(QSGRendererInterface::GraphicsApi::OpenVG == gApi) {
+        gApiName = "OpenVG";
+    } else if(QSGRendererInterface::GraphicsApi::Vulkan == gApi) {
+        gApiName = "Vulkan";
+    } else if(QSGRendererInterface::GraphicsApi::Software == gApi) {
+        gApiName = "Software";
+    }
+
     QString aboutHtml;
     aboutHtml += "<div style='margin:0px 20px;'>";
     aboutHtml += tr("<p><b>Application version %1</b><br/>").arg(Qb::VERSION);
@@ -26,7 +46,11 @@ AboutDialog::AboutDialog(QWidget* parent) : QDialog(parent)
     aboutHtml += QString("<p>&copy; %1 %2<br/>").arg(Qb::COPYRIGHT, Qb::AUTHOR);
     aboutHtml += QString("<a href=%1>%1</a></p>").arg(Qb::WWWADDRESS);
     aboutHtml += "<p>" + BrowserSettings::instance()->defaultUserAgent() + "</p>";
-    aboutHtml += "</div>";
+    aboutHtml += "<p>" + QString("Graphics API: ") + gApiName + "</p>";
+    if(!QQuickWindow::sceneGraphBackend().isEmpty()) {
+        aboutHtml += "<p>" + QString("Graphics Backend: ") + QQuickWindow::sceneGraphBackend() + "</p>";
+    }
+    aboutHtml += "<br></div>";
 
     auto label = new QLabel(this);
     label->setWordWrap(true);
