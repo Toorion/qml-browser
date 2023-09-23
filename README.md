@@ -53,6 +53,9 @@ Available options:
 * software - software adaptation
 * openvg - OpenVG renderer
 
+Check the active version of 3D graphic renderer and 3D graphics API you can in "About browser" dialog.
+
+
 ### Linux
 
 The default 3D graphics API for Linux - OpenGL
