@@ -15,14 +15,14 @@ Available on [Release](https://github.com/Toorion/qml-browser/releases) page
 
 ## Building
 
-# Linux
+### Linux
 ```sh
 mkdir build && cd build
 qmake ..
 make && make install
 ```
 
-# Windows
+### Windows
 
 Use QtCreator to build 
 Kit QT + MSVC2019
@@ -41,6 +41,47 @@ For opening QML pages it should have
 
 Content-Type: text/qml
 
+## 3D Configuration
+
+The default 3D graphics renderer is RHI
+
+It's working perfectly, but if you want to, you can override this default behaviour by setting QT_QUICK_BACKEND environment variable.
+
+Available options:
+
+* rhi - RHI renderer (default)
+* software - software adaptation
+* openvg - OpenVG renderer
+
+### Linux
+
+The default 3D graphics API for Linux - OpenGL
+
+It's working perfectly, but if you'd like, you can override this default behaviour by setting the QSG_RHI_BACKEND environment variable
+
+Available option:
+
+* opengl - OpenGL (default)
+* vulkan - Vulkan 3D API (requires installation of Vulkan 3D API software)
+* null - No 3D API
+
+### Windows
+
+The default 3D graphics API for Windows depends on the graphics driver you are using. 
+
+It can be OpenGL ES (which is fast, but has some [functional limitations](https://doc.qt.io/qt-6/qtquick3d-requirements.html#opengl-es-2-0-support)
+
+It can also be Direct3D 11, which can sometimes be very slow.
+
+You can override this default behaviour by setting the QSG_RHI_BACKEND environment variable
+
+Available option:
+
+* opengl - OpenGL
+* d3d11 - Direct3D API
+* vulkan - Vulkan 3D API (requires Vulkan 3D API software to be installed)
+* metal - Metal 3D API (requires Metal 3D API software to be installed)
+* null - No 3D API
 
 ## QML advantages over HTML
 
