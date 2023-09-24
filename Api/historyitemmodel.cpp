@@ -46,7 +46,7 @@ void HistoryItemModel::fill(QList<HistoryItem *> items)
 
 QHash<int, QByteArray> HistoryItemModel::roleNames() const {
     QHash<int, QByteArray> roles;
-    roles[IndexRole] = "index";
+    roles[IdxRole] = "idx";
     roles[IdRole] = "id";
     roles[UrlRole] = "url";
     roles[TitleRole] = "title";
@@ -108,7 +108,7 @@ QVariant HistoryItemModel::data(const QModelIndex & index, int role) const {
         return QVariant();
 
     HistoryItem *item = m_items[index.row()];
-    if (role == IndexRole)
+    if (role == IdxRole)
         return index.row();
     else if (role == IdRole)
         return item->id();

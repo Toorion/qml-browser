@@ -8,5 +8,8 @@ Item {
         anchors.verticalCenter: parent.verticalCenter 
         anchors.horizontalCenter: parent.horizontalCenter 
         text: "Blank"
+        font.pixelSize: window.height / 3
+        font.weight: Font.DemiBold
+        color: "#EEE"
     }
 }

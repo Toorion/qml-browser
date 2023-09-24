@@ -1,33 +1,27 @@
-import QtQuick 2.2
-import QtQuick.Controls 2.12
-import QtQuick.Layouts 1.15
-import QtQuick.Shapes 1.15
+import QtQuick
+import QtQuick.Controls
+import QtQuick.Layouts
+import QtQuick.Shapes
 
 
 Item {
     anchors.fill: parent
-    property string title: 'Download history'
+    property string title: 'Downloads'
+    property int pixelSize: 16
 
     ColumnLayout {
 
-        width:820
+        id: main
+        width: window.width * 0.8
         height: parent.height
         anchors.horizontalCenter: parent.horizontalCenter
         
         Text {
-            text: "DownloadList"
+            text: "Downloads"
+            font.pixelSize: pixelSize
+            topPadding: 20
+            bottomPadding: 20
         } 
-
-        Button {
-            text: "Test"
-            onClicked: console.log(parent.width)
-        }
-
-        
-        Button {
-            text: "Remove 3"
-            onClicked: qi.downloadHistoryModel().removeDownloadItem(2)
-        }
 
         Component {
             id: rowDelegate
@@ -37,15 +31,27 @@ Item {
                 required property string url
                 required property string path
                 required property string received
-                width: 820
+                width: main.width
                 height: 90
-                //anchors.horizontalCenter: parent.horizontalCenter
                 Rectangle {
-                    width: 800
+                    width: parent.width - 20
                     height: parent.height
                     border.color: "#dcdcdc"
                     border.width: 1
-                    radius: 10
+                    MouseArea {
+                        id: rowMouseArea
+                        anchors.fill: parent
+                        hoverEnabled: true
+                        onEntered: {
+                            parent.color = "#eee"
+                        }
+                        onExited: {
+                            parent.color = "#fff"
+                        }   
+                        // onClicked: 
+                        cursorShape: Qt.PointingHandCursor
+                    }
+
                     Shape {
                         x: 10
                         width: 30
@@ -58,7 +64,6 @@ Item {
                             PathSvg { path: "M6 2c-1.1 0-1.99.9-1.99 2L4 20c0 1.1.89 2 1.99 2H18c1.1 0 2-.9 2-2V8l-6-6H6zm7 7V3.5L18.5 9H13z" }
                         }
                     }
-
                     Rectangle {
                         id: icon_box
                         x: 50
@@ -108,7 +113,7 @@ Item {
                         background: Rectangle {
                             border.width: 0
                             radius: 15
-                            color: del_item.down ? "#999999" :(del_item.hovered?"#f0f0f0": "#ffffff")
+                            color: del_item.down ? "#999999" :(del_item.hovered?"#bbb": "#fff")
                         }
                         onClicked: qi.downloadHistoryModel().removeDownloadItem(index)
                     }

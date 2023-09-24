@@ -1,118 +1,108 @@
-import QtQuick 2.2
-import QtQuick.Controls 2.3
-import QtQuick.Layouts 1.15
-import QtQuick.Shapes 1.15
+import QtQuick
+import QtQuick.Controls
+import QtQuick.Layouts
+import QtQuick.Shapes
 
 Item {
     
     property string title: 'Visiting history'
+    property int pixelSize: 16
     
     anchors.fill: parent
 
     ColumnLayout {
 
-        width:820
+        id: main
+        width: window.width * 0.8
         height: parent.height
         anchors.horizontalCenter: parent.horizontalCenter
         
         Text {
             text: "Visiting history"
+            font.pixelSize: pixelSize
+            topPadding: 20
+            bottomPadding: 20
         } 
         
         TextField {
             id: search
-            height:10
-            font.pixelSize: 10
             placeholderText: qsTr("Search history")
-            background: Rectangle {
-                implicitWidth: 600
-                implicitHeight: 20
-                opacity: enabled ? 1 : 0.3
-                border.width: 1
-                radius: 10
-            }
+            implicitWidth: parent.width
             onTextChanged: listView.searchText = text
         }
         
         Component {
             id: rowDelegate
-            Row {
-                id: "row"
-                required property string index
+            Rectangle {
+                required property int index
+                required property string idx
                 required property string url
                 required property string type
                 required property string title
                 required property string iconUrl
                 required property string added
                 required property string host
-                width: 820
+                width: main.width
                 height: 30
-                Rectangle {
-                    width: 800
+                MouseArea {
+                    id: rowMouseArea
+                    anchors.fill: parent
+                    hoverEnabled: true
+                    onEntered: {
+                        parent.color = "#eee"
+                    }
+                    onExited: {
+                        parent.color = "#fff"
+                    }   
+                    onClicked: window.open(url)
+                    cursorShape: Qt.PointingHandCursor
+                }
+                Text {
                     height: parent.height
-                    //CheckBox {
-                        //width:16
-                        //height:16
-
-                        //id: modelCheckBoxes
-                        //checked: model.checked
-                        //text: model.number
-                        //indicator.width: 18
-                        //indicator.height: 18
-                    //}
-                    Text {
-                        x: 30
-                        height: 10
-                        text: Qt.formatDateTime(added, "dd.MM hh:mm")
+                    text: Qt.formatDateTime(added, "dd.MM hh:mm")
+                    verticalAlignment: Text.AlignVCenter
+                }
+                Image {
+                    x:80
+                    y:4
+                    width:parent.height - 4
+                    height:parent.height - 4
+                    source: iconUrl
+                }
+                Text {
+                    x: 110
+                    height: parent.height
+                    text: title + " | " + host
+                    verticalAlignment: Text.AlignVCenter
+                }
+                Button {
+                    id: rowBtn
+                    width:30
+                    x: parent.width - width
+                    text: "..."
+                    onClicked: menu.open()
+                    background: Rectangle {
+                        implicitWidth: 20
+                        implicitHeight: 20
+                        color: rowBtn.hovered ? "#bbbbbb" : "#eee"
                     }
-                    Image {
-                        x:100
-                        width:16
-                        height:16
-                        source: iconUrl
-                    }
-                    Text {
-                        x: 120
-                        height: 10
-                        text: title + " | " + host
-                        MouseArea {
-                            anchors.fill: parent
-                            onClicked: window.open(url)
-                            cursorShape: Qt.PointingHandCursor
-                        }
-                    }
-                    Button {
-                        x:800
-                        width:30
-                        id: rowBtn
-                        text: "..."
-                        onClicked: menu.open()
+                    Menu {
+                        id: menu
+                        y: rowBtn.height
                         background: Rectangle {
-                            implicitWidth: 20
-                            implicitHeight: 20
-                            radius: 14
-                            color: rowBtn.hovered ? "#bbbbbb" : "white"
+                            implicitWidth: 200
+                            border.color: "#cccccc"
                         }
-                        Menu {
-                            id: menu
-                            y: rowBtn.height
-                            background: Rectangle {
-                                implicitWidth: 200
-                                border.color: "#cccccc"
-                                radius: 6
-                            }
 
-                            MenuItem {
-                                text: "More from this site"
-                                onTriggered: search.text = "host:" + row.host
-                            }
-                            MenuItem {
-                                text: "Remove from history"
-                                onTriggered: qi.visitHistoryModel().removeHistoryItem(row.index)
-                            }
+                        MenuItem {
+                            text: "More from this site"
+                            onTriggered: search.text = "host:" + row.host
+                        }
+                        MenuItem {
+                            text: "Remove from history"
+                            onTriggered: qi.visitHistoryModel().removeHistoryItem(row.idx)
                         }
                     }
-
                 }
             }
         } 
@@ -121,7 +111,6 @@ Item {
         SortFilterModel {
             id: delegateModel
             model: qi.visitHistoryModel()
-            //model: Qqq
             delegate: rowDelegate
             
             filterAcceptsItem: function(item) {
@@ -139,16 +128,17 @@ Item {
             
             property string searchText: ''
             
-            Layout.topMargin: 30
+            Layout.topMargin: 20
             height: parent.height
             spacing: 2
             Layout.fillWidth: true
             Layout.fillHeight: true
             // model: qi.visitHistoryModel()
             model: delegateModel
-            //delegate: rowDelegate
+
             
             onSearchTextChanged: delegateModel.update()
+
             
             
             //ScrollBar.vertical: ScrollBar {

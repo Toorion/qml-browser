@@ -34,7 +34,7 @@ public:
     void fill(QList<HistoryItem*> items);
 
     enum ItemRoles {
-        IndexRole = Qt::UserRole + 1,
+        IdxRole = Qt::UserRole + 1,
         IdRole,
         UrlRole,
         TitleRole,
