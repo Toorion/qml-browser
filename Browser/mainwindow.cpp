@@ -71,7 +71,7 @@ MainWindow::MainWindow(QWebEngineProfile *profile)
     connect(tabWidget, &TabWidget::titleChanged, this, &MainWindow::handleWebViewTitleChanged);
 
     connect(tabWidget, &TabWidget::currentChanged, this, [=]() {
-        navigationBar->switchTab(tabWidget->currentView());
+        navigationBar->connectTab(tabWidget->currentView());
     });
 
     connect(navigationBar->urlLineEdit, &QLineEdit::returnPressed, this, [=]() {
@@ -98,6 +98,12 @@ MainWindow::MainWindow(QWebEngineProfile *profile)
         tab->setUrl(QUrl(INTERNAL_URL_SCHEME + "://" + BrowserPaths::downloadManagerName));
     });
     layout->addWidget(m_downloadManagerWidget);
+
+    m_progressBar = new QProgressBar(this);
+    m_progressBar->setMaximumHeight(1);
+    m_progressBar->setTextVisible(false);
+    connect(navigationBar, &NavigationBar::loadProgress, this, &MainWindow::handleLoadProgress);
+    layout->addWidget(m_progressBar);
 }
 
 
@@ -127,6 +133,10 @@ void MainWindow::closeDownloadManager()
     m_downloadManagerWidget->setVisible(false);
 }
 
+void MainWindow::handleLoadProgress(int progress)
+{
+    m_progressBar->setValue(progress);
+}
 
 
 

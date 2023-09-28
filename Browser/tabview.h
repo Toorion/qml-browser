@@ -70,13 +70,12 @@ signals:
     void titleChanged(const QString &title);
     void iconChanged(const QIcon &icon);
     void urlChanged(const QUrl url);
+    void loadProgress(int progress);
 
 
 private:
 
     BaseView *m_pageView = nullptr;
-
-    int m_loadProgress;
 
     QUrl m_currentUrl;
 

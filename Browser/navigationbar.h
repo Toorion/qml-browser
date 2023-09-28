@@ -34,7 +34,7 @@ class NavigationBar : public QToolBar
 public:
     explicit NavigationBar(QWidget *parent = nullptr);
 
-    void switchTab(TabView *tabView);
+    void connectTab(TabView *tabView);
 
     QAction *historyBackAction;
     QAction *historyForwardAction;
@@ -54,8 +54,12 @@ public:
 
     TabView *activeTabView = nullptr;
 
-public Q_SLOTS:
+public slots:
     void changeUrl(const QUrl url);
+    void handleLoadProgress(int progress);
+
+signals:
+    void loadProgress(int progress);
 
 private:
     QShortcut *m_closeTabShortcut;

@@ -262,15 +262,16 @@ NavigationBar::NavigationBar(QWidget *parent) : QToolBar(parent)
 }
 
 
-void NavigationBar::switchTab(TabView *tabView)
+void NavigationBar::connectTab(TabView *tabView)
 {
     if(activeTabView) {
         disconnect(activeTabView, &TabView::urlChanged, nullptr, nullptr);
+        disconnect(activeTabView, &TabView::loadProgress, nullptr, nullptr);
     }
-
     if(tabView) {
         activeTabView = tabView;
         connect(activeTabView, &TabView::urlChanged, this, &NavigationBar::changeUrl);
+        connect(activeTabView, &TabView::loadProgress, this, &NavigationBar::handleLoadProgress);
         changeUrl(activeTabView->getCurrentUrl());
         urlLineEdit->setFocus();
     }
@@ -284,4 +285,13 @@ void NavigationBar::changeUrl(const QUrl url)
     urlLineEdit->setText(url.toString());
     stopReloadAction->setEnabled(true);
 
+}
+
+void NavigationBar::handleLoadProgress(int progress)
+{
+    if (0 < progress && progress < 100) {
+        emit loadProgress(progress);
+    } else {
+        emit loadProgress(0);
+    }
 }

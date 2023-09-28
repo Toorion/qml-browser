@@ -78,9 +78,11 @@ void TabView::loadUrl(const QUrl url, const bool reload)
     }
     connect(m_reply, &QNetworkReply::finished, this, &TabView::loadFinished);
     connect(m_reply, &QNetworkReply::downloadProgress, this, [=](qint64 ist, qint64 max) {
+        int progress = 0;
         if(max > 0) {
-            m_loadProgress = 100 / max * ist;
+            progress = 100 / max * ist;
         }
+        emit loadProgress(progress);
     });
 }
 

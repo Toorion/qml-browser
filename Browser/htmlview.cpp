@@ -35,6 +35,7 @@ HtmlView::HtmlView(QSplitter *splitter, QWidget *parent, QWebEngineProfile *prof
     connect(this, &QWebEngineView::urlChanged, dynamic_cast<TabView*>(parent), &TabView::tabUrlChanged);
     connect(this, &QWebEngineView::loadFinished, dynamic_cast<TabView*>(parent), &TabView::tabLoadFinished);
     connect(this, &QWebEngineView::iconUrlChanged, dynamic_cast<TabView*>(parent), &TabView::tabIconUrlChanged);
+    connect(this, &QWebEngineView::loadProgress, dynamic_cast<TabView*>(parent), &TabView::loadProgress);
 }
 
 HtmlView::~HtmlView()

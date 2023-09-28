@@ -25,6 +25,7 @@
 #include <QWebEngineProfile>
 #include <QCloseEvent>
 #include "../Api/downloadmanagerwidget.h"
+#include <QProgressBar>
 
 
 class MainWindow : public QMainWindow
@@ -48,6 +49,10 @@ public:
         return m_downloadManagerWidget;
     };
 
+
+public Q_SLOT:
+    void handleLoadProgress(int progress);
+
 protected:
     void closeEvent(QCloseEvent *event) override;
 
@@ -57,6 +62,8 @@ private:
     DownloadManagerWidget *m_downloadManagerWidget = nullptr;
 
     void handleWebViewTitleChanged(const QString &title);
+
+    QProgressBar *m_progressBar = nullptr;
 
 };
 #endif // MAINWINDOW_H

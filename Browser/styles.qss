@@ -6,6 +6,9 @@ MainWindow#QUI-BrowserWindow {
 /*
  * TabWidget
  */
+TabWidget {
+    border: 0px
+}
 TabWidget QTabBar::tab:disabled {
     padding: 0px 0px 0px 0px;
     margin: 0px 0px 0px 0px;
@@ -50,6 +53,16 @@ TabWidget QTabBar::close-button {
 }
 TabWidget QTabBar::close-button:hover {
     background-color: #C0C3C8;
+}
+
+/*
+ * QProgressBar
+ */
+QProgressBar {
+    border: 0px;
+} 
+QProgressBar::chunk {
+    background-color: #41cd52;
 }
 
 
