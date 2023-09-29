@@ -30,7 +30,7 @@ class API_EXPORT ApiWeb : public ApiCommon
 {
     Q_OBJECT
     Q_PROPERTY(Document *document READ document CONSTANT)
-    Q_PROPERTY(Window *window READ window NOTIFY windowChanged)
+    Q_PROPERTY(Window *window READ window CONSTANT)
 
 public:
 
@@ -50,10 +50,6 @@ public:
         m_locationUrl->setUrl(url);
         m_baseUrl = url;
     }
-
-signals:
-
-    void windowChanged();
 
 private:
 
