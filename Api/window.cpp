@@ -17,7 +17,8 @@
 * along with this program.  If not, see <http://www.gnu.org/licenses/>.
 ****************************************************************************/
 #include "window.h"
-
+#include <QWindow>
+#include <QDebug>
 
 Window::Window(QObject *parent) : QObject(parent)
 {
@@ -45,3 +46,20 @@ bool Window::open(const QString url, const QString windowName, const QString win
     emit newWindowRequested(QUrl(url), windowName, windowFeatures);
     return true;
 }
+
+void Window::setWidth(int width)
+{
+    if(m_width != width) {
+        m_width = width;
+        emit widthChanged();
+    }
+}
+
+void Window::setHeight(int height)
+{
+    if(m_height != height) {
+        m_height = height;
+        emit heightChanged();
+    }
+}
+

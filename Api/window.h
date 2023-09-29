@@ -23,14 +23,13 @@
 #include <QUrl>
 #include "location.h"
 #include "Api_global.h"
-#include <QWidget>
 
 class API_EXPORT Window : public QObject
 {
     Q_OBJECT
     Q_PROPERTY(Location location MEMBER location)
-    Q_PROPERTY(int width READ width CONSTANT)
-    Q_PROPERTY(int height READ height CONSTANT)
+    Q_PROPERTY(int width READ width NOTIFY widthChanged)
+    Q_PROPERTY(int height READ height NOTIFY heightChanged)
 
 public:
     explicit Window(QObject *parent = nullptr);
@@ -41,17 +40,15 @@ public:
 
     Location location;
 
-    void setTab(QWidget *tab) {
-        m_tab = tab;
-    }
-
+    void setWidth(int width);
+    void setHeight(int width);
 
     int width() {
-        return m_tab->width();
+        return m_width;
     }
 
     int height() {
-        return m_tab->height();
+        return m_height;
     }
 
 
@@ -59,10 +56,13 @@ signals:
 
     void newTabRequested(const QUrl url);
     void newWindowRequested(const QUrl url, const QString windowName, const QString windowFeatures);
+    void widthChanged();
+    void heightChanged();
 
 private:
 
-    QWidget *m_tab;
+    int m_width;
+    int m_height;
 
 };
 

@@ -119,7 +119,6 @@ void QmlView::continueLoad()
             accessRights->allowAllInternalAccess();
         }
 
-        m_api->window()->setTab(this);
         m_api->setAccessRights(accessRights);
 
         connect(m_api->window(), &Window::newWindowRequested, [=] (const QUrl &url) {
@@ -258,6 +257,14 @@ void QmlView::indexLoaded()
         foreach (const QQmlError &error, m_component->errors()) {
             m_api->console()->error(error.toString());
         }
+    }
+}
+
+void QmlView::resizeEvent(QResizeEvent *event)
+{
+    if(m_api) {
+        m_api->window()->setHeight(this->height());
+        m_api->window()->setWidth(this->width());
     }
 }
 

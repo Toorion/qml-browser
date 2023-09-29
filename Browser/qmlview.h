@@ -60,7 +60,7 @@ public:
 
     const QUrl iconUrl() override;
 
-public Q_SLOTS:
+public slots:
     void reload() override;
     void continueLoad();
     void indexLoaded();
@@ -71,6 +71,10 @@ signals:
     void iconChanged(const QIcon &icon);
     void urlChanged(const QUrl &url);
     void loadFinished(const bool &ok);
+
+protected:
+
+    void resizeEvent(QResizeEvent *event) override;
 
 
 private:
@@ -91,7 +95,7 @@ private:
 
     QmlDevTools *m_devTools = nullptr;
 
-    ApiWeb *m_api;
+    ApiWeb *m_api = nullptr;
 
     QString m_title;
 
