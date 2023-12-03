@@ -31,11 +31,16 @@
 #include "mainwindow.h"
 #include "downloadmanagerwidget.h"
 #include "browser.h"
-#include "networkaccessmanagerfactory.h"
 #include <QVBoxLayout>
 #include <QQuick3D>
 #include <QApplication>
+#include "navigationbar.h"
+#include <QQmlPropertyMap>
 #include "apppaths.h"
+#include "browsersettings.h"
+#include "urlhelper.h"
+
+
 
 QmlView::QmlView(QSplitter *splitter, QWidget *parent)
     : QWidget(parent)
@@ -49,8 +54,6 @@ QmlView::QmlView(QSplitter *splitter, QWidget *parent)
     // Required for quick3d, but conflict with some datavisualisation which depends on OpenGL 2.1
     m_quickView->setFormat(QQuick3D::idealSurfaceFormat());
 
-    m_quickView->engine()->setNetworkAccessManagerFactory(NetworkAccessManagerFactory::instance());
-
     m_container = QWidget::createWindowContainer(m_quickView, this, Qt::Widget);
 
     auto layout = new QVBoxLayout();
@@ -59,7 +62,9 @@ QmlView::QmlView(QSplitter *splitter, QWidget *parent)
     layout->addWidget(m_container);
     setLayout(layout);
 
-    m_api = new ApiWeb(qobject_cast<HttpManager*>(m_quickView->engine()->networkAccessManager()));
+    m_networkManagerFactory.setUserAgent(browserSettings->appUserAgent());
+    m_quickView->engine()->setNetworkAccessManagerFactory(&m_networkManagerFactory);
+    m_api = new ApiWeb(&m_networkManagerFactory);
 
     DownloadManagerWidget *downloadManager = (qobject_cast<MainWindow*>(window()))->downloadManagerWidget();
     m_api->qi()->setDownloadManagerWidget(downloadManager);
@@ -73,17 +78,40 @@ QmlView::QmlView(QSplitter *splitter, QWidget *parent)
     connect(this, &QmlView::titleChanged, dynamic_cast<TabView*>(parent), &TabView::titleChanged);
     connect(this, &QmlView::iconChanged, dynamic_cast<TabView*>(parent), &TabView::iconChanged);
     connect(this, &QmlView::loadFinished, dynamic_cast<TabView*>(parent), &TabView::tabLoadFinished);
+    connect(m_api->locationUrl(), &LocationUrl::urlChanged, dynamic_cast<TabView*>(parent), &TabView::setUrl);
 }
-
 
 QmlView::~QmlView()
 {
+    if(m_dappInstaller) {
+        disconnect(m_dappInstaller, nullptr, nullptr, nullptr);
+    }
+    // Some 3D scenes didn't clean properly, force it
     if(m_contentItem) {
         deepClean(m_contentItem->children());
     }
 }
 
+/*!
+ *
+ * Remote content loading
+ *
+ */
+void QmlView::setUrl(const QUrl &url)
+{
+    QNetworkRequest req(url);
+    m_networkManagerFactory.enableCache(AppPaths::webAppPath(url), this);
+    m_networkManagerFactory.setMaxCacheSize(BrowserSettings::instance()->appCacheMaxSize().toInt() * 1024 * 1024);
+    m_reply = m_networkManagerFactory.create(this)->get(req);
+    connect(m_reply, &QNetworkReply::finished, this, &QmlView::indexLoaded);
+}
 
+
+/*!
+ *
+ * Local content usage (without cache)
+ *
+ */
 void QmlView::setContent(const QByteArray &content, const QString &mimeType, const QUrl &baseUrl)
 {
     (void)mimeType;
@@ -102,35 +130,29 @@ void QmlView::setContent(const QByteArray &content, const QString &mimeType, con
     }
 }
 
-
-
-
 void QmlView::continueLoad()
 {
     if(m_component->status() == QQmlComponent::Ready) {
 
-        // set LocalStorage path per host
-        m_qmlEngine.setOfflineStoragePath(AppPaths::webAppPath(m_url));
+        // set LocalStorage path per host / dapps
+        m_qmlEngine.setOfflineStoragePath(UrlHelper::urlLocalPath(m_url));
 
         m_context = new QQmlContext(m_quickView->engine()->rootContext());
 
         AccessRights *accessRights = new AccessRights();
-        if(m_url.scheme() == INTERNAL_URL_SCHEME) {
+        if(m_url.scheme().compare(INTERNAL_URL_SCHEME) == 0) {
             accessRights->allowAllInternalAccess();
         }
-
         m_api->setAccessRights(accessRights);
 
-        connect(m_api->window(), &Window::newWindowRequested, [=] (const QUrl &url) {
-            qobject_cast<TabView*>(mainBrowser.createWindow()->tabWidget->currentWidget())->setUrl(url);
+        connect(m_api->window(), &Window::newWindowRequested, [=] (const QString &url) {
+            qobject_cast<TabView*>(mainBrowser.createWindow()->tabWidget->currentWidget())->loadUrl(url);
         });
 
-        connect(m_api->window(), &Window::newTabRequested, this, [=] (const QUrl &url) {
+        connect(m_api->window(), &Window::newTabRequested, this, [=] (const QString &url) {
             MainWindow *mainWindow = qobject_cast<MainWindow*>(window());
-            mainWindow->tabWidget->createActiveTab()->setUrl(url);
+            mainWindow->tabWidget->createActiveTab()->loadUrl(url);
         });
-
-        connect(m_api->locationUrl(), &LocationUrl::urlChanged, this, &QmlView::urlChanged);
 
         m_context->setContextObject(m_api);
 
@@ -163,7 +185,34 @@ void QmlView::continueLoad()
             });
         }
 
+        // Turn off reloading mode if it's active
+        NetworkAccessManagerFactory *namf = static_cast<NetworkAccessManagerFactory*>(m_quickView->engine()->networkAccessManagerFactory());
+        namf->setReloading(false);
+
         emit loadFinished(true);
+
+        // Start DAPP install
+        if(m_installationUrl) {
+            m_dappInstaller = &DappInstaller::instance();
+
+            QUrl dappUrl = UrlHelper::gitToDappUrl(*m_installationUrl);
+            qDebug() << "DURL" << dappUrl;
+            m_api->qi()->setProgressInfoProperty("url", QVariant::fromValue(m_installationUrl->toString()));
+            m_api->qi()->setProgressInfoProperty("dappUrl", QVariant::fromValue(dappUrl));
+
+            NavigationBar *navBar = (qobject_cast<MainWindow*>(window()))->navigationBar;
+            navBar->installAction->setEnabled(false);
+            connect(m_dappInstaller, &DappInstaller::finished, this, [navBar](){
+                navBar->installAction->setEnabled(true);
+            });
+            connect(m_dappInstaller, &DappInstaller::progressChanged, m_api->qi(), &Qi::setProgress);
+            connect(m_dappInstaller, &DappInstaller::progressOutput, m_api->qi(), [this](QString message){
+                m_api->console()->log(message);
+            });
+            qDebug() << "PATH" << UrlHelper::urlToLocalPath(dappUrl, true).toLocalFile();
+            m_dappInstaller->installOrUpdate(*m_installationUrl, UrlHelper::urlToLocalPath(dappUrl, true).toLocalFile());
+            m_installationUrl = nullptr;
+        }
     }
 
     if (!m_component->errors().isEmpty()) {
@@ -216,23 +265,6 @@ void QmlView::toggleDevTools()
     }
 }
 
-void QmlView::setUrl(const QUrl &url, const bool reload)
-{
-    QNetworkRequest req(url);
-    if(reload) {
-        req.setAttribute(QNetworkRequest::Attribute::CacheLoadControlAttribute, QNetworkRequest::CacheLoadControl::AlwaysNetwork);
-    }
-    NetworkAccessManagerFactory *nf = static_cast<NetworkAccessManagerFactory*>(m_quickView->engine()->networkAccessManagerFactory());
-    nf->setReloading(reload);
-    m_reply = mainBrowser.httpManager()->get(req);
-    connect(m_reply, &QNetworkReply::finished, this, &QmlView::indexLoaded);
-// todo
-//    connect(m_reply, &QNetworkReply::downloadProgress, this, [=](qint64 ist, qint64 max) {
-//        if(max > 0) {
-//            m_loadProgress = 100 / max * ist;
-//        }
-//    });
-}
 
 const QString QmlView::title()
 {
@@ -244,13 +276,13 @@ const QUrl QmlView::iconUrl()
     return m_iconUrl;
 }
 
-void QmlView::indexLoaded()
-{
+void QmlView::indexLoaded() {
     m_url = m_reply->url();
     m_api->setLocationUrl(m_url);
 
     m_component = new QQmlComponent(m_quickView->engine());
-    connect(m_component, &QQmlComponent::statusChanged, this, &QmlView::continueLoad);
+    connect(m_component, &QQmlComponent::statusChanged, this,
+            &QmlView::continueLoad);
     m_component->setData(m_reply->readAll(), m_url);
 
     if (!m_component->errors().isEmpty()) {
@@ -260,18 +292,17 @@ void QmlView::indexLoaded()
     }
 }
 
-void QmlView::resizeEvent(QResizeEvent *event)
-{
-    if(m_api) {
+void QmlView::resizeEvent(QResizeEvent *event) {
+    Q_UNUSED(event);
+    if (m_api) {
         m_api->window()->setHeight(this->height());
         m_api->window()->setWidth(this->width());
     }
 }
 
-
 void QmlView::reload() {
     m_quickView->engine()->clearComponentCache();
-    TabView *tabView = dynamic_cast<TabView*>(m_parent);
-    tabView->loadUrl(tabView->getCurrentUrl(), true);
+    m_networkManagerFactory.setReloading(true);
+    setUrl(m_url);
 }
 

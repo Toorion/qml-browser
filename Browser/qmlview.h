@@ -33,6 +33,10 @@
 #include <QString>
 #include <QThread>
 #include <QNetworkReply>
+#include "dappinstaller.h"
+#include "networkaccessmanagerfactory.h"
+
+
 
 class QmlView : public QWidget, public BaseView
 {
@@ -54,11 +58,15 @@ public:
 
     int viewType() override {return BaseView::TYPE_QML;};
 
-    void setUrl(const QUrl &url, const bool reload = false) override;
+    void setUrl(const QUrl &url) override;
 
     const QString title() override;
 
     const QUrl iconUrl() override;
+
+    void setInstallationUrl(QUrl *url) {
+        m_installationUrl = url;
+    };
 
 public slots:
     void reload() override;
@@ -69,7 +77,6 @@ signals:
 
     void titleChanged(const QString &title);
     void iconChanged(const QIcon &icon);
-    void urlChanged(const QUrl &url);
     void loadFinished(const bool &ok);
 
 protected:
@@ -104,6 +111,14 @@ private:
     void deepClean(const QObjectList list);
 
     QNetworkReply *m_reply;
+
+    bool m_reloading = false;
+
+    QUrl *m_installationUrl = nullptr;
+
+    DappInstaller *m_dappInstaller = nullptr;
+
+    NetworkAccessManagerFactory m_networkManagerFactory;
 
 };
 

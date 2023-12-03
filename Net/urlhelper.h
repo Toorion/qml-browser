@@ -16,19 +16,33 @@
 * You should have received a copy of the GNU General Public License
 * along with this program.  If not, see <http://www.gnu.org/licenses/>.
 ****************************************************************************/
-#include "locationurl.h"
+#ifndef URLHELPER_H
+#define URLHELPER_H
 
-LocationUrl::LocationUrl(QObject *parent) : QObject(parent)
+#include <QUrl>
+
+#define INTERNAL_URL_SCHEME QLatin1String("internal")
+#define DAPP_URL_SCHEME QLatin1String("dapp")
+#define QML_MAIN_FILE QString("main.qml")
+#define HTML_MAIN_FILE QString("main.html")
+#define DIR_ALTER_SP QLatin1Char('@')
+
+class UrlHelper
 {
+public:
+    UrlHelper();
 
-}
+    bool static isLocalSource(const QUrl &url);
 
-bool LocationUrl::setRawUrl(const QString rawUrl)
-{
-    m_url = QUrl::fromUserInput(rawUrl);
-    if(m_url.isValid()) {
-        emit urlChanged(m_url);
-        return true;
-    }
-    return false;
-}
+    QUrl static urlToLocalPath(const QUrl &url, bool toDir = false);
+
+    QUrl static assertFilename(const QUrl &url);
+
+    QString static urlLocalPath(const QUrl &url);
+
+    QUrl static gitToDappUrl(const QUrl &url);
+
+
+};
+
+#endif // URLHELPER_H

@@ -41,6 +41,9 @@ public:
     QAction *stopReloadAction;
 
     QLineEdit *urlLineEdit;
+
+    QAction *installAction;
+
     QAction *favAction;
 
     QAction *newTabAction;

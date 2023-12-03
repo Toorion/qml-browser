@@ -6,8 +6,9 @@ MainWindow#QUI-BrowserWindow {
 /*
  * TabWidget
  */
-TabWidget {
-    border: 0px
+TabWidget::pane {
+    background: white;
+    border-bottom: 0px solid;
 }
 TabWidget QTabBar::tab:disabled {
     padding: 0px 0px 0px 0px;

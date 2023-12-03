@@ -19,7 +19,7 @@
 #include "historyitemmodel.h"
 #include "historydb.h"
 #include <QQmlEngine>
-#include "httpmanager.h"
+#include "urlhelper.h"
 
 HistoryItemModel &HistoryItemModel::instance(QObject *parent)
 {

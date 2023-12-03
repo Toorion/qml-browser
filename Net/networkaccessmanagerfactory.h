@@ -19,17 +19,19 @@
 #ifndef NETWORKACCESSMANAGERFACTORY_H
 #define NETWORKACCESSMANAGERFACTORY_H
 
-#include <QQmlNetworkAccessManagerFactory>
 #include "Net_global.h"
+#include <QQmlNetworkAccessManagerFactory>
+#include "networkdiskcache.h"
 
 class NET_EXPORT NetworkAccessManagerFactory : public QQmlNetworkAccessManagerFactory
 {
 public:
+
     QNetworkAccessManager *create(QObject *parent) override;
 
-    static NetworkAccessManagerFactory *instance();
-
     void setMaxCacheSize(qint64 size);
+
+    void enableCache(QString cacheDir, QObject *parent);
 
     void setUserAgent(const QString userAgent);
 
@@ -37,14 +39,21 @@ public:
         m_reloading = reloading;
     }
 
+    bool reloading() {
+        return m_reloading;
+    }
+
 private:
 
-    qint64 m_maxCacheSize;
+    QObject *m_parent;
+
+    static qint64 m_maxCacheSize;
 
     QString m_userAgent;
 
-    bool m_reloading;
+    bool m_reloading = false;
 
+    NetworkDiskCache *m_cache = nullptr;
 };
 
 #endif // NETWORKACCESSMANAGERFACTORY_H

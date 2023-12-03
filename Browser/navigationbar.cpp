@@ -31,8 +31,8 @@
 #include <QApplication>
 #include "tabwidget.h"
 #include "browserpaths.h"
-#include "httpmanager.h"
 #include "aboutdialog.h"
+#include "urlhelper.h"
 
 NavigationBar::NavigationBar(QWidget *parent) : QToolBar(parent)
 {
@@ -110,13 +110,13 @@ NavigationBar::NavigationBar(QWidget *parent) : QToolBar(parent)
     }
     reloadShortcuts.append(QKeySequence(Qt::CTRL | Qt::Key_R));
     stopReloadAction->setShortcuts(reloadShortcuts);
-
-    connect(stopReloadAction, &QAction::triggered, this, [=]() {
-        if (activeTabView && activeTabView->pageView())
-            activeTabView->pageView()->reload();
-    });
     stopReloadAction->setIcon(QIcon(QStringLiteral("icons:reload.png")));
+    connect(stopReloadAction, &QAction::triggered, this, [=]() {
+        if (activeTabView)
+            activeTabView->reload();
+    });
     addAction(stopReloadAction);
+
 
     /**
     * URL
@@ -126,6 +126,18 @@ NavigationBar::NavigationBar(QWidget *parent) : QToolBar(parent)
     urlLineEdit->addAction(favAction, QLineEdit::LeadingPosition);
     urlLineEdit->setClearButtonEnabled(true);
     addWidget(urlLineEdit);
+
+
+    /**
+     * Install
+     */
+    installAction = new QAction(this);
+    installAction->setIcon(QIcon(QStringLiteral("icons:download.svg")));
+    connect(installAction, &QAction::triggered, this, [=]() {
+        if (activeTabView)
+            activeTabView->installUrl(urlLineEdit->text());
+    });
+    addAction(installAction);
 
 
     /**
@@ -163,7 +175,7 @@ NavigationBar::NavigationBar(QWidget *parent) : QToolBar(parent)
     mainMenu->addAction(historyAction);
     connect(historyAction, &QAction::triggered, this, [this](){
         TabView *tabView = (qobject_cast<TabWidget*>(this->parent()))->createActiveTab();
-        tabView->setUrl(INTERNAL_URL_SCHEME + "://" + BrowserPaths::historyManagerName);
+        tabView->loadUrl(INTERNAL_URL_SCHEME + "://" + BrowserPaths::historyManagerName);
     });
 
     // Downloads
@@ -172,7 +184,7 @@ NavigationBar::NavigationBar(QWidget *parent) : QToolBar(parent)
     mainMenu->addAction(downloadsAction);
     connect(downloadsAction, &QAction::triggered, this, [this](){
         TabView *tabView = (qobject_cast<TabWidget*>(this->parent()))->createActiveTab();
-        tabView->setUrl(INTERNAL_URL_SCHEME + "://" + BrowserPaths::downloadManagerName);
+        tabView->loadUrl(INTERNAL_URL_SCHEME + "://" + BrowserPaths::downloadManagerName);
     });
 
 
@@ -215,14 +227,14 @@ NavigationBar::NavigationBar(QWidget *parent) : QToolBar(parent)
     mainMenu->addAction(settingsAction);
     connect(settingsAction, &QAction::triggered, this, [this](){
         TabView *tabView = (qobject_cast<TabWidget*>(this->parent()))->createActiveTab();
-        tabView->setUrl(INTERNAL_URL_SCHEME + "://" + BrowserPaths::settingsManagerName);
+        tabView->loadUrl(INTERNAL_URL_SCHEME + "://" + BrowserPaths::settingsManagerName);
     });
 
     mainMenu->addSeparator();
 
     // About
     auto aboutAction = new QAction("About QmlBrowser", this);
-    connect(aboutAction, &QAction::triggered, [=](){
+    connect(aboutAction, &QAction::triggered, this, [=](){
         AboutDialog* dialog = new AboutDialog(parent->window());
         dialog->open();
     });
@@ -241,7 +253,7 @@ NavigationBar::NavigationBar(QWidget *parent) : QToolBar(parent)
 
     auto reloadStyleAction = new QAction("Reload Browser Styles", this);
     connect(reloadStyleAction, &QAction::triggered, this, [=](){
-        QFile file("styles.qss");
+        QFile file(BrowserPaths::rootPath() + "/styles.qss");
         file.open(QFile::ReadOnly);
         QString styleSheet = QLatin1String(file.readAll());
         ((QApplication*) QApplication::instance())->setStyleSheet(styleSheet);

@@ -23,17 +23,10 @@
 #include "historydb.h"
 #include "historyitemmodel.h"
 #include "browsersettings.h"
-#include "networkaccessmanagerfactory.h"
-#include "httpmanager.h"
 
 
 Browser::Browser()
 {
-    auto httpFactory = NetworkAccessManagerFactory::instance();
-    httpFactory->setMaxCacheSize(BrowserSettings::instance()->appCacheMaxSize().toInt() * 1024 * 1024);
-    httpFactory->setUserAgent(browserSettings->appUserAgent());
-    m_httpManager = qobject_cast<HttpManager*>(httpFactory->create(this));
-
     HistoryItemModel *historyItemModel = &HistoryItemModel::instance();
     historyItemModel->fill(HistoryDb::list());
 
@@ -84,11 +77,4 @@ MainWindow *Browser::createWindow(bool offTheRecord)
     mainWindow->show();
     return mainWindow;
 }
-
-HttpManager *Browser::httpManager()
-{
-    return m_httpManager;
-}
-
-
 

@@ -18,14 +18,18 @@
 ****************************************************************************/
 #include "browserpaths.h"
 #include <QGlobalStatic>
+#include "urlhelper.h"
 
 Q_GLOBAL_STATIC(BrowserPaths, gs_browser_paths)
 
 QLatin1String const BrowserPaths::downloadManagerName = QLatin1String("downloads");
-
 QLatin1String const BrowserPaths::historyManagerName = QLatin1String("history");
-
 QLatin1String const BrowserPaths::settingsManagerName = QLatin1String("settings");
+QLatin1String const BrowserPaths::blankPageName = QLatin1String("blank");
+QLatin1String const BrowserPaths::errorPageName = QLatin1String("error");
+QString const BrowserPaths::installPageName = QLatin1String("install");
+
+
 
 BrowserPaths::BrowserPaths()
 {
@@ -35,18 +39,26 @@ BrowserPaths::BrowserPaths()
 QString BrowserPaths::historyManagerPath()
 {
     BrowserPaths* p = gs_browser_paths();
-    return p->toolsPath() + QLatin1Char('/') + historyManagerName + QLatin1Char('/') + p->qmlMainFile;
+    return p->toolsPath().toLocalFile() + DIR_SP + historyManagerName;
 }
 
 QString BrowserPaths::downloadManagerPath()
 {
     BrowserPaths* p = gs_browser_paths();
-    return p->toolsPath() + QLatin1Char('/') + downloadManagerName + QLatin1Char('/') + p->qmlMainFile;
+    return p->toolsPath().toLocalFile() + DIR_SP + downloadManagerName;
 }
 
 QString BrowserPaths::settingsManagerPath()
 {
     BrowserPaths* p = gs_browser_paths();
-    return p->toolsPath() + QLatin1Char('/') + settingsManagerName + QLatin1Char('/') + p->qmlMainFile;
+    return p->toolsPath().toLocalFile() + DIR_SP + settingsManagerName;
+}
+
+QUrl BrowserPaths::installPageUrl()
+{
+    QUrl url;
+    url.setScheme(INTERNAL_URL_SCHEME);
+    url.setHost(installPageName);
+    return url;
 }
 

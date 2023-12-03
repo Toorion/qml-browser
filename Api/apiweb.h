@@ -34,7 +34,7 @@ class API_EXPORT ApiWeb : public ApiCommon
 
 public:
 
-    explicit ApiWeb(HttpManager *httpManager, QObject *parent = nullptr);
+    explicit ApiWeb(NetworkAccessManagerFactory *networkManagerFactory, QObject *parent = nullptr);
 
     Window *window() {return m_window;}
 

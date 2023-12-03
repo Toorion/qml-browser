@@ -19,31 +19,29 @@
 #include "networkaccessmanagerfactory.h"
 #include <QNetworkAccessManager>
 #include "httpmanager.h"
-#include "networkdiskcache.h"
 
 QNetworkAccessManager *NetworkAccessManagerFactory::create(QObject *parent)
 {
     auto httpManager = new HttpManager(parent);
 
-    auto cache = new NetworkDiskCache();
-    cache->setMaximumCacheSize(m_maxCacheSize);
-
-    httpManager->setCache(cache);
+    if(m_cache) {
+        httpManager->setCache(m_cache);
+    }
     httpManager->setUserAgent(m_userAgent);
     httpManager->setReloading(m_reloading);
 
     return httpManager;
 }
 
-NetworkAccessManagerFactory *NetworkAccessManagerFactory::instance()
-{
-    static NetworkAccessManagerFactory instance;
-    return &instance;
-}
-
 void NetworkAccessManagerFactory::setMaxCacheSize(qint64 size)
 {
-    m_maxCacheSize = size;
+    m_cache->setMaximumCacheSize(size);
+}
+
+void NetworkAccessManagerFactory::enableCache(QString cacheDir, QObject *parent)
+{
+    m_cache = new NetworkDiskCache(cacheDir, parent);
+
 }
 
 void NetworkAccessManagerFactory::setUserAgent(const QString userAgent)

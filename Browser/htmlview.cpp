@@ -74,12 +74,8 @@ void HtmlView::toggleDevTools()
     }
 }
 
-void HtmlView::setUrl(const QUrl &url, const bool m_reload)
+void HtmlView::setUrl(const QUrl &url)
 {
-    if(m_reload) {
-        reload();
-        return;
-    }
     QWebEngineView::setUrl(url);
 }
 

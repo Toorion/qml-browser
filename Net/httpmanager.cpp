@@ -27,6 +27,7 @@
 #include "internalnetworkreply.h"
 #include <QByteArray>
 #include <QFileInfo>
+#include "urlhelper.h"
 
 HttpManager::HttpManager(QObject *parent)
     : QNetworkAccessManager(parent)
@@ -122,20 +123,22 @@ void HttpManager::setUserAgent(const QString userAgent)
 
 QNetworkReply *HttpManager::createRequest(Operation op, const QNetworkRequest &request, QIODevice *outgoingData)
 {
-    if(request.url().scheme() == INTERNAL_URL_SCHEME) {
+    QUrl url = UrlHelper::urlToLocalPath(request.url());
+    qDebug() << "FILE" << url;
+    if(url.isLocalFile()) {
 
         InternalNetworkReply *reply = new InternalNetworkReply();
 
-        QFile toolAppFile(AppPaths::toolPath(request.url()));
-        if(toolAppFile.exists() && toolAppFile.open(QIODevice::ReadOnly | QIODevice::Text))
+        QFile file(url.toLocalFile());
+        if(file.exists() && file.open(QIODevice::ReadOnly | QIODevice::Text))
         {
             reply->setHttpStatusCode( 200 );
             reply->setContentType(QByteArray::fromStdString(QML_MIME.data()));
             reply->setUrl(request.url());
-            reply->setContent(toolAppFile.readAll());
+            reply->setContent(file.readAll());
 
-            toolAppFile.close();
-            toolAppFile.deleteLater();
+            file.close();
+            file.deleteLater();
         } else {
             reply->setHttpStatusCode( 404, "Not Found" );
             reply->setContentType("text/html");

@@ -38,11 +38,7 @@ AppPaths::~AppPaths()
 QString AppPaths::rootPath()
 {
     AppPaths* p = gs_app_paths();
-#ifdef Q_OS_WIN
-    return p->m_appPath;
-#else
-    return p->m_appPath + QLatin1String("/..");
-#endif
+    return p->m_appPath.toLocalFile();
 }
 
 QString AppPaths::iconsPath()
@@ -51,25 +47,17 @@ QString AppPaths::iconsPath()
     return rootPath() + p->iconsDir;
 }
 
-QString AppPaths::toolsPath()
+QUrl AppPaths::toolsPath()
 {
     AppPaths* p = gs_app_paths();
-    return rootPath() + p->toolsDir;
+    return p->m_appPath.resolved(p->toolsDir);
 }
 
-QString AppPaths::toolPath(const QUrl requestUrl)
+QUrl AppPaths::toolPath(QUrl url)
 {
     AppPaths* p = gs_app_paths();
-
-    QString uri = requestUrl.adjusted(QUrl::RemoveScheme | QUrl::StripTrailingSlash).toString().remove(0,2);
-
-    if(uri.count('/') == 0) {
-            uri += QLatin1Char('/') + p->qmlMainFile;
-        }
-
-    return QUrl::fromLocalFile(
-        toolsPath() + QLatin1Char('/') + QDir::cleanPath(uri)
-    ).toLocalFile();
+    QString uri = url.adjusted(QUrl::RemoveScheme | QUrl::StripTrailingSlash).toString().remove(0,2);
+    return toolsPath().resolved(uri);
 }
 
 QString AppPaths::currentProfilePath()
@@ -87,12 +75,18 @@ QString AppPaths::cachePath()
 QString AppPaths::dataPath()
 {
     AppPaths* p = gs_app_paths();
-    return p->m_dataPath;
+    return p->m_dataPath.toLocalFile();
 }
 
 QString AppPaths::dbPath()
 {
     return dataPath();
+}
+
+QUrl AppPaths::dappsPath()
+{
+    AppPaths* p = gs_app_paths();
+    return p->m_dataPath.resolved(p->dappsDir);
 }
 
 QString AppPaths::downloadPath()
@@ -112,26 +106,28 @@ QString AppPaths::webAppPath(const QUrl &url)
     quint16 id = qChecksum(cleanUrl.toEncoded());
     QString strId = QString::number(id, 16);
 
-    return p->m_cachePath + strId.left(2) + QLatin1Char('/') + strId.right(2) + QLatin1Char('/');
+    return p->m_cachePath + strId.left(2) + DIR_SP + strId.right(2) + DIR_SP;
 }
 
-QString AppPaths::dappsPath(const uint &id)
+QUrl AppPaths::dappPath(const QUrl &internalUrl)
 {
-    // todo
-    return dataPath() + QLatin1String("dapps/") + QString::number(id) + QLatin1Char('/');
+    return dappsPath().resolved(internalUrl);
 }
 
 void AppPaths::init()
 {
-    m_appPath = QCoreApplication::applicationDirPath();
+    m_appPath = QUrl::fromLocalFile(QCoreApplication::applicationDirPath());
+
+#ifndef Q_OS_WIN
+    m_appPath = m_appPath.resolved(QUrl("."));
+#endif
+
     m_currentProfilePath = QStandardPaths::writableLocation(QStandardPaths::AppConfigLocation);
     m_downloadPath = QStandardPaths::writableLocation(QStandardPaths::DownloadLocation);
 
-    m_dataPath = QStandardPaths::writableLocation(QStandardPaths::AppDataLocation);
-    if (!m_dataPath.endsWith(QLatin1Char('/')))
-        m_dataPath += QLatin1Char('/');
+    m_dataPath = QUrl::fromLocalFile(QStandardPaths::writableLocation(QStandardPaths::AppDataLocation));
     if (m_dataPath.isEmpty()) qFatal("Cannot determine settings storage location");
-    QDir dataDir(m_dataPath);
+    QDir dataDir(m_dataPath.toLocalFile());
     if(!dataDir.mkpath(dataDir.absolutePath())) {
         qFatal("wrong dataPath");
     }

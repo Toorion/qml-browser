@@ -49,7 +49,7 @@ NetworkDiskCache *NetworkDiskCache::self = nullptr;
     Creates a new disk cache. The \a parent argument is passed to
     QAbstractNetworkCache's constructor.
  */
-NetworkDiskCache::NetworkDiskCache(QObject *parent)
+NetworkDiskCache::NetworkDiskCache(QString cacheDir, QObject *parent)
     : QAbstractNetworkCache(*new NetworkDiskCachePrivate, parent)
 {
     self = this;
@@ -64,14 +64,9 @@ NetworkDiskCache::~NetworkDiskCache()
     qDeleteAll(d->inserting);
 }
 
-NetworkDiskCache *NetworkDiskCache::instance()
-{
-    return self;
-}
-
 QString NetworkDiskCache::cacheDirectory(const QUrl &url)
 {
-    QString cacheDirectory = AppPaths::webAppPath(url) + CACHE_DIR + QLatin1Char('/');
+    QString cacheDirectory = m_cacheDir + QLatin1Char('/') + CACHE_DIR + QLatin1Char('/');
     QDir helper;
     helper.mkpath(cacheDirectory + PREPARED_SLASH);
     return cacheDirectory;

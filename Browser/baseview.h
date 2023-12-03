@@ -46,7 +46,7 @@ public:
 
     virtual void toggleDevTools() = 0;
 
-    virtual void setUrl(const QUrl &url, const bool reload = false) = 0;
+    virtual void setUrl(const QUrl &url) = 0;
 
     virtual const QString title() = 0;
 

@@ -1,4 +1,4 @@
-import QtQuick 2.2
+import QtQuick 6.3
 
 
 Item {

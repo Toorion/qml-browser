@@ -24,7 +24,6 @@
 #include <QVector>
 #include <QWebEngineProfile>
 #include <QObject>
-#include "httpmanager.h"
 
 class MainWindow;
 
@@ -37,14 +36,10 @@ public:
 
     MainWindow *createWindow(bool offTheRecord = false);
 
-    HttpManager *httpManager();
-
 private:
     QVector<MainWindow*> mainWindows;
 
     QScopedPointer<QWebEngineProfile> m_profile;
-
-    HttpManager *m_httpManager;
 
 };
 

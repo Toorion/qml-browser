@@ -54,8 +54,8 @@ public:
 
 signals:
 
-    void newTabRequested(const QUrl url);
-    void newWindowRequested(const QUrl url, const QString windowName, const QString windowFeatures);
+    void newTabRequested(const QString url);
+    void newWindowRequested(const QString url, const QString windowName, const QString windowFeatures);
     void widthChanged();
     void heightChanged();
 

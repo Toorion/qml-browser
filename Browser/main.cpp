@@ -34,7 +34,8 @@
 #include <QDir>
 #include <QTimer>
 #include <QQuickStyle>
-
+#include <QQmlPropertyMap>
+#include "urlhelper.h"
 
 void messageHandler(QtMsgType type, const QMessageLogContext &context, const QString &msg)
 {
@@ -67,14 +68,14 @@ void messageHandler(QtMsgType type, const QMessageLogContext &context, const QSt
 }
 
 
-QUrl commandLineUrlArgument()
+QString commandLineUrlArgument()
 {
     const QStringList args = QCoreApplication::arguments();
     for (const QString &arg : args.mid(1)) {
         if (!arg.startsWith(QLatin1Char('-')))
-            return QUrl::fromUserInput(arg);
+               return arg;
     }
-    return QUrl();
+    return "";
 }
 
 
@@ -119,6 +120,7 @@ int main(int argc, char *argv[])
     qRegisterMetaType<HistoryItem*>();
     qRegisterMetaType<HistoryItemModel*>();
     qRegisterMetaType<DynamicObject*>();
+    qRegisterMetaType<QQmlPropertyMap*>();
 
 
     /*
@@ -130,11 +132,11 @@ int main(int argc, char *argv[])
         tmpView->deleteLater();
     });
 
-    QUrl url = commandLineUrlArgument();
-    if(url.isEmpty()) {
-        url.setUrl(INTERNAL_URL_SCHEME + QLatin1String("://blank"));
+    QString rawUrl = commandLineUrlArgument();
+    if(rawUrl.isEmpty()) {
+        rawUrl = INTERNAL_URL_SCHEME + QLatin1String("://blank");
     }
-    window->tabWidget->currentView()->loadUrl(url);
+    window->tabWidget->currentView()->loadUrl(rawUrl);
 
     return app.exec();
 }

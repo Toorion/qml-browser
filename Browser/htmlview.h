@@ -42,7 +42,7 @@ public:
 
     void toggleDevTools() override;
 
-    void setUrl(const QUrl &url, const bool reload = false) override;
+    void setUrl(const QUrl &url) override;
 
     int viewType() override {return BaseView::TYPE_HTML;};
 

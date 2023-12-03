@@ -24,9 +24,7 @@
 #include <QFileInfo>
 #include "Net_global.h"
 
-#define INTERNAL_URL_SCHEME QLatin1String("internal")
 #define QML_MIME QLatin1String("text/qml")
-#define QML_EXT QLatin1String("qml")
 #define HTML_MIME QLatin1String("text/html")
 #define HTML_EXT QLatin1String("html")
 

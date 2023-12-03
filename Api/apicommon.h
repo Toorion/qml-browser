@@ -21,12 +21,12 @@
 
 #include <QObject>
 #include "console.h"
-#include "document.h"
 #include "qi.h"
 #include "downloaditem.h"
 #include "accessrights.h"
 #include "httpmanager.h"
 #include "Api_global.h"
+#include "networkaccessmanagerfactory.h"
 
 class API_EXPORT ApiCommon : public QObject
 {
@@ -35,7 +35,7 @@ class API_EXPORT ApiCommon : public QObject
     Q_PROPERTY(Qi *qi READ qi CONSTANT)
 
 public:
-    explicit ApiCommon(HttpManager *httpManager, QObject *parent = nullptr);
+    explicit ApiCommon(NetworkAccessManagerFactory *networkManagerFactory, QObject *parent = nullptr);
 
     Console *console() {return m_console;}
 
@@ -53,6 +53,8 @@ public:
 
     AccessRights *accessRights();
 
+    HttpManager *httpManager();
+
 signals:
     void requestDownload(const QString url);
 
@@ -66,7 +68,9 @@ private:
 
     AccessRights *m_accessRights;
 
-    HttpManager *m_httpManager;
+    NetworkAccessManagerFactory *m_networkManagerFactory;
+
+    HttpManager *m_httpManager = nullptr;
 
 };
 

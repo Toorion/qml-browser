@@ -9,7 +9,7 @@ SUBDIRS += \
 
 CONFIG += ordered
 
-unix:{
-    QMAKE_LFLAGS += "-Wl,-rpath,\'\$$ORIGIN\'"
-}
+# unix:{
+#     QMAKE_LFLAGS += "-Wl,-rpath,\'\$$ORIGIN\'"
+# }
 

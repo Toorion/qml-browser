@@ -30,9 +30,8 @@
 #include "downloaditemproxy.h"
 #include "browserpaths.h"
 #include <regex>
-#include "searchengine.h"
 #include <QScreen>
-#include "httpmanager.h"
+#include "urlhelper.h"
 #include <QPixmap>
 #include <QPainterPath>
 #include <QRect>
@@ -75,14 +74,7 @@ MainWindow::MainWindow(QWebEngineProfile *profile)
     });
 
     connect(navigationBar->urlLineEdit, &QLineEdit::returnPressed, this, [=]() {
-        QUrl url;
-        const std::regex url_regex("^(https?:\\/\\/)?([\\da-z\\.-]+)\\.([a-z\\.]{2,6})([\\/\\w \\.\\-_&#\\?]*)*\\/?$");
-        if (std::regex_match(navigationBar->urlLineEdit->text().toStdString(), url_regex) || navigationBar->urlLineEdit->text().toLower().startsWith(INTERNAL_URL_SCHEME)) {
-            url = QUrl::fromUserInput(navigationBar->urlLineEdit->text());
-        } else {
-            url = SearchEngine::searchUrl(navigationBar->urlLineEdit->text());
-        }
-        tabWidget->currentView()->setUrl(url);
+        tabWidget->currentView()->loadUrl(navigationBar->urlLineEdit->text());
     });
 
     connect(tabWidget, &TabWidget::plusClicked, tabWidget, &TabWidget::createActiveTab);
@@ -95,7 +87,7 @@ MainWindow::MainWindow(QWebEngineProfile *profile)
     connect(m_downloadManagerWidget, &DownloadManagerWidget::closeManager, this, &MainWindow::closeDownloadManager);
     connect(m_downloadManagerWidget, &DownloadManagerWidget::showAllTriggered, this, [=] () {
         TabView *tab = tabWidget->createActiveTab();
-        tab->setUrl(QUrl(INTERNAL_URL_SCHEME + "://" + BrowserPaths::downloadManagerName));
+        tab->loadUrl(INTERNAL_URL_SCHEME + "://" + BrowserPaths::downloadManagerName);
     });
     layout->addWidget(m_downloadManagerWidget);
 

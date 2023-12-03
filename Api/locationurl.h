@@ -31,7 +31,9 @@ public:
 
     QUrl url() {return m_url;}
 
-    void setUrl(const QUrl url) {m_url = url;}
+    void setUrl(const QUrl url) {
+        m_url = url;
+    }
 
     bool setRawUrl(const QString rawUrl);
 

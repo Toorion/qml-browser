@@ -23,6 +23,8 @@
 #include "App_global.h"
 #include <QUrl>
 
+#define DIR_SP QLatin1Char('/')
+
 class APP_EXPORT AppPaths
 {
 public:
@@ -33,9 +35,9 @@ public:
 
     QString static iconsPath();
 
-    QString static toolsPath();
+    QUrl static toolsPath();
 
-    QString static toolPath(QUrl const requestUrl);
+    QUrl static toolPath(QUrl url);
 
     QString static currentProfilePath();
 
@@ -45,26 +47,26 @@ public:
 
     QString static dbPath();
 
+    QUrl static dappsPath();
+
     QString static downloadPath();
 
     QString static webAppPath(const QUrl &url);
 
-    QString static dappsPath(const uint &id);
+    QUrl static dappPath(const QUrl &url);
 
-    QString const iconsDir = QLatin1String("/icons");
+    QString const iconsDir = QLatin1String("icons");
 
-    QString const toolsDir = QLatin1String("/tools");
+    QString const toolsDir = QLatin1String("tools/");
 
-    QString const qmlMainFile = QLatin1String("main.qml");
-
-    QString const htmlMainFile = QLatin1String("index.html");
+    QString const dappsDir = QLatin1String("dapps/");
 
 private:
     void init();
 
-    QString m_appPath;
+    QUrl m_appPath;
 
-    QString m_dataPath;
+    QUrl m_dataPath;
 
     QString m_currentProfilePath;
 

@@ -36,10 +36,8 @@ class NET_EXPORT NetworkDiskCache : public QAbstractNetworkCache
     Q_OBJECT
 
 public:
-    explicit NetworkDiskCache(QObject *parent = nullptr);
+    explicit NetworkDiskCache(QString cacheDir, QObject *parent = nullptr);
     ~NetworkDiskCache();
-
-    static NetworkDiskCache* instance();
 
     QString cacheDirectory(const QUrl &url);
     QString dataDirectory(const QUrl &url);
@@ -68,6 +66,9 @@ protected:
 //    virtual qint64 expire();
 
 private:
+
+    QString m_cacheDir;
+
     Q_DECLARE_PRIVATE(NetworkDiskCache)
     Q_DISABLE_COPY(NetworkDiskCache)
 };

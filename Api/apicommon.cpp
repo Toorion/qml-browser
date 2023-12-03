@@ -21,12 +21,13 @@
 #include "qi.h"
 #include "downloaditem.h"
 #include <QStandardPaths>
-#include "mainapplication.h"
+#include <QEventLoop>
 #include "networkdiskcache.h"
+#include "urlhelper.h"
 
-ApiCommon::ApiCommon(HttpManager *httpManager, QObject *parent)
+ApiCommon::ApiCommon(NetworkAccessManagerFactory *networkManagerFactory, QObject *parent)
     : QObject(parent),
-      m_httpManager(httpManager)
+      m_networkManagerFactory(networkManagerFactory)
 {
     m_qi = new Qi(this);
     m_console = new Console(this);
@@ -53,7 +54,7 @@ bool ApiCommon::confirm(const QString message, const QString title)
 
 DownloadItem *ApiCommon::download(const QString url)
 {
-    DownloadItem *item = m_httpManager->download(QUrl(url));
+    DownloadItem *item = httpManager()->download(QUrl(url));
     m_qi->downloadManagerWidget()->downloadRequested(item);
     m_qi->downloadManagerWidget()->setVisible(true);
     return item;
@@ -68,7 +69,12 @@ QString ApiCommon::preload(const QString inputUrl)
         url = QUrl::fromUserInput(inputUrl);
     }
 
-    QNetworkReply *reply = m_httpManager->get(QNetworkRequest(url));
+    QUrl u = UrlHelper::urlToLocalPath(url);
+    if(u.isLocalFile()) {
+        return "file:/" + u.toLocalFile();
+    }
+
+    QNetworkReply *reply = httpManager()->get(QNetworkRequest(url));
 
     QEventLoop loop;
     connect(reply, &QNetworkReply::finished, &loop, [&loop]() {
@@ -85,7 +91,7 @@ QString ApiCommon::preload(const QString inputUrl)
     reply->close();
     reply->deleteLater();
 
-    return "file:/" + (static_cast<NetworkDiskCache*>(m_httpManager->cache()))->filePath(url);
+    return "file:/" + (static_cast<NetworkDiskCache*>(httpManager()->cache()))->filePath(url);
 }
 
 void ApiCommon::setAccessRights(AccessRights *accessRights)
@@ -96,5 +102,13 @@ void ApiCommon::setAccessRights(AccessRights *accessRights)
 AccessRights *ApiCommon::accessRights()
 {
     return m_accessRights;
+}
+
+HttpManager *ApiCommon::httpManager()
+{
+    if(nullptr == m_httpManager) {
+        m_httpManager = qobject_cast<HttpManager*>(m_networkManagerFactory->create(this));
+    }
+    return m_httpManager;
 }
 

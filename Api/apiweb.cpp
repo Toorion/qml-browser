@@ -18,7 +18,7 @@
 ****************************************************************************/
 #include "apiweb.h"
 
-ApiWeb::ApiWeb(HttpManager *httpManager, QObject *parent) : ApiCommon(httpManager, parent)
+ApiWeb::ApiWeb(NetworkAccessManagerFactory *networkManagerFactory, QObject *parent) : ApiCommon(networkManagerFactory, parent)
 {
     m_window = new Window(this);
 
@@ -28,4 +28,5 @@ ApiWeb::ApiWeb(HttpManager *httpManager, QObject *parent) : ApiCommon(httpManage
 
     m_window->location.setLocationUrl(m_locationUrl);
 
+    m_document->location.setLocationUrl(m_locationUrl);
 }

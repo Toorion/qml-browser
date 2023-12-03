@@ -29,7 +29,8 @@
 #include <QSplitter>
 #include <QIcon>
 #include <QWebEngineProfile>
-#include "../Api/historyitem.h"
+#include "historyitem.h"
+#include "networkaccessmanagerfactory.h"
 
 class TabView : public QWidget
 {
@@ -42,11 +43,17 @@ public:
         return m_pageView;
     };
 
+    void loadUrl(const QString &rawUrl);
+
+    void installUrl(const QString &rawUrl);
+
+    void reload();
+
     void setUrl(const QUrl &url);
 
-    void loadUrl(const QUrl url, const bool reload = false);
-
     void loadFinished();
+
+
 
     QUrl getCurrentUrl() {
         return m_currentUrl;
@@ -87,7 +94,9 @@ private:
 
     QSplitter *m_splitter;
 
-    bool m_reload;
+    bool m_reload = false;
+
+    QUrl *m_installationUrl = nullptr;
 
 };
 

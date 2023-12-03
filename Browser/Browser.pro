@@ -55,6 +55,9 @@ INCLUDEPATH += $$PWD/Api
 DEPENDPATH += $$PWD/App
 DEPENDPATH += $$PWD/Net
 DEPENDPATH += $$PWD/Api
+INCLUDEPATH += $$PWD/../3rdparty/libgit2/include
+DEPENDPATH += $$PWD/../3rdparty/libgit2/include
+
 
 include(../App/App.pri)
 include(../Net/Net.pri)
@@ -71,7 +74,10 @@ else: unix:!android: target.path = /opt/$${TARGET}/bin
 LIBS += -L$$OUT_PWD/../App/ -lApp
 LIBS += -L$$OUT_PWD/../Net/ -lNet
 LIBS += -L$$OUT_PWD/../Api/ -lApi
+LIBS += -L$$PWD/../3rdparty/libgit2/build -lgit2
 
-# https://forum.qt.io/topic/119599/qtwebengine-link-errors/5
-# For QT6 not neccessary
-# QMAKE_LFLAGS += -fuse-ld=gold
+copyfiles.commands = cp $$PWD/styles.qss $$OUT_PWD/../ && cp -r $$PWD/icons $$OUT_PWD/../ && cp -r $$PWD/../Api/tools $$OUT_PWD/../
+first.depends = $(first) copyfiles
+export(first.depends)
+export(copyfiles.commands)
+QMAKE_EXTRA_TARGETS += first copyfiles

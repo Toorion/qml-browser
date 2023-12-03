@@ -20,6 +20,7 @@
 #define BROWSERPATHS_H
 
 #include <apppaths.h>
+#include <QUrl>
 
 class BrowserPaths : public AppPaths
 {
@@ -29,10 +30,15 @@ public:
     QLatin1String const static historyManagerName;
     QLatin1String const static downloadManagerName;
     QLatin1String const static settingsManagerName;
+    QLatin1String const static blankPageName;
+    QLatin1String const static errorPageName;
+    QString const static installPageName;
 
     QString static historyManagerPath();
     QString static downloadManagerPath();
     QString static settingsManagerPath();
+
+    QUrl static installPageUrl();
 
 };
 

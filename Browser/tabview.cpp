@@ -17,7 +17,6 @@
 * along with this program.  If not, see <http://www.gnu.org/licenses/>.
 ****************************************************************************/
 #include "tabview.h"
-#include "browser.h"
 #include <QVBoxLayout>
 #include "qmlview.h"
 #include <QToolBar>
@@ -31,6 +30,12 @@
 #include "historyitemmodel.h"
 #include "historyitem.h"
 #include <QWebEnginePage>
+#include <regex>
+#include "searchengine.h"
+#include "browserpaths.h"
+#include "urlhelper.h"
+
+
 
 TabView::TabView(QWebEngineProfile *profile, QWidget *parent) : QWidget(parent),
   m_profile(profile)
@@ -52,42 +57,49 @@ TabView::~TabView()
     }
 }
 
+void TabView::loadUrl(const QString &rawUrl)
+{
+    QUrl url = QUrl::fromUserInput(rawUrl);
+    if(!url.isValid()) {
+        url = SearchEngine::searchUrl(rawUrl);
+    }
+    setUrl(url);
+}
+
+void TabView::installUrl(const QString &rawUrl)
+{
+    m_installationUrl = new QUrl(QUrl::fromUserInput(rawUrl));
+    if(m_installationUrl->isEmpty()) {
+        // todo: Goto error page
+        qWarning("Invalid URL");
+        return;
+    }
+    setUrl(BrowserPaths::installPageUrl());
+}
+
+void TabView::reload()
+{
+    if(pageView()) {
+        m_pageView->reload();
+    }
+}
 
 void TabView::setUrl(const QUrl &url)
 {
-    if(url == m_currentUrl) {
-        pageView()->reload();
-        return;
-    }
-
-    loadUrl(url);
-}
-
-
-void TabView::loadUrl(const QUrl url, const bool reload)
-{
     QNetworkRequest req(url);
-    m_reload = reload;
-    if(m_reload) {
-        req.setAttribute(QNetworkRequest::Attribute::CacheLoadControlAttribute, QNetworkRequest::CacheLoadControl::AlwaysNetwork);
-    }
-    if(url.scheme() == INTERNAL_URL_SCHEME) {
-        m_reply = mainBrowser.httpManager()->get(req);
+    NetworkAccessManagerFactory networkManagerFactory;
+    auto httpManager = networkManagerFactory.create(this);
+    if(UrlHelper::isLocalSource(url)) {
+        m_reply = httpManager->get(req);
     } else {
-        m_reply = mainBrowser.httpManager()->head(req);
+        if(m_reload) {
+            req.setAttribute(QNetworkRequest::Attribute::CacheLoadControlAttribute, QNetworkRequest::CacheLoadControl::AlwaysNetwork);
+            m_reload = false;
+        }
+        m_reply = httpManager->head(req);
     }
     connect(m_reply, &QNetworkReply::finished, this, &TabView::loadFinished);
-    connect(m_reply, &QNetworkReply::downloadProgress, this, [=](qint64 ist, qint64 max) {
-        int progress = 0;
-        if(max > 0) {
-            progress = 100 / max * ist;
-        }
-        emit loadProgress(progress);
-    });
 }
-
-
-
 
 void TabView::loadFinished()
 {
@@ -105,10 +117,13 @@ void TabView::loadFinished()
     } else {
         m_pageView = new HtmlView(m_splitter, this, m_profile);
     }
-    if(m_reply->url().scheme() == INTERNAL_URL_SCHEME) {
+    if(UrlHelper::isLocalSource(m_reply->url())) {
         m_pageView->setContent(m_reply->readAll(), mimeType, m_reply->url());
+        if(m_installationUrl) {
+          static_cast<QmlView*>(m_pageView)->setInstallationUrl(m_installationUrl);
+        }
     } else {
-        m_pageView->setUrl(m_reply->url(), m_reload);
+        m_pageView->setUrl(m_reply->url());
     }
 
     m_splitter->insertWidget(0, dynamic_cast<QWidget*>(m_pageView));
@@ -116,7 +131,6 @@ void TabView::loadFinished()
 
     m_reply->deleteLater();
 }
-
 
 
 void TabView::tabUrlChanged(const QUrl url)
@@ -159,7 +173,7 @@ void TabView::back()
     if(!m_currentUrl.isEmpty()) {
         historyForward.push(new HistoryItem(m_currentUrl, m_pageView->viewType(), m_pageView->title(), m_pageView->iconUrl()));
     }
-    loadUrl(historyItem->url());
+    setUrl(historyItem->url());
 }
 
 void TabView::forward()
