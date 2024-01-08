@@ -53,8 +53,6 @@ public:
 
     void loadFinished();
 
-
-
     QUrl getCurrentUrl() {
         return m_currentUrl;
     };

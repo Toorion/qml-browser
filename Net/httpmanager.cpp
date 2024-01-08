@@ -124,7 +124,6 @@ void HttpManager::setUserAgent(const QString userAgent)
 QNetworkReply *HttpManager::createRequest(Operation op, const QNetworkRequest &request, QIODevice *outgoingData)
 {
     QUrl url = UrlHelper::urlToLocalPath(request.url());
-    qDebug() << "FILE" << url;
     if(url.isLocalFile()) {
 
         InternalNetworkReply *reply = new InternalNetworkReply();

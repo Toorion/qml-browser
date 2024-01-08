@@ -88,6 +88,10 @@ bool MainApplication::authDialog(QString &username, QString &password, const QSt
 //    if (mApp->isPrivate()) {
 //        save->setVisible(false);
 //    }
+    if(!username.isEmpty()) {
+        user->setText(username);
+    }
+
 
     if (dialog->exec() != QDialog::Accepted) {
         delete dialog;

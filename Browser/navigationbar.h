@@ -19,6 +19,8 @@
 #ifndef NAVIGATIONBAR_H
 #define NAVIGATIONBAR_H
 
+#include "urllineedit.h"
+
 #include <QWidget>
 #include <QToolBar>
 #include <QAction>
@@ -40,9 +42,7 @@ public:
     QAction *historyForwardAction;
     QAction *stopReloadAction;
 
-    QLineEdit *urlLineEdit;
-
-    QAction *installAction;
+    UrlLineEdit *urlLineEdit;
 
     QAction *favAction;
 

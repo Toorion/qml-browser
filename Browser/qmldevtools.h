@@ -34,6 +34,8 @@ public:
 public Q_SLOTS:
     void writeLogLine(const Console::logLine *line);
 
+    void clearLog();
+
 private:
     QVBoxLayout *layout;
 

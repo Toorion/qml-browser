@@ -35,6 +35,8 @@ public:
 
     Q_INVOKABLE void error(const QString message);
 
+    void clear();
+
     enum lineType {
         L_ERROR,
         L_LOG
@@ -52,6 +54,7 @@ public:
 signals:
 
     void append(Console::logLine *line);
+    void cleared();
 
 
 private:

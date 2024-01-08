@@ -34,6 +34,12 @@ void Console::error(const QString message)
     write(message, lineType::L_ERROR);
 }
 
+void Console::clear()
+{
+    logList.clear();
+    emit cleared();
+}
+
 QList<Console::logLine> Console::logRecords()
 {
     return logList;

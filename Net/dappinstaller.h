@@ -44,7 +44,7 @@ public:
 
     bool status(const char *path);
 
-    void checkout(const char *path, const std::string tag);
+    bool checkout(const char *path, const std::string tag);
 
     bool mergeToHead(const char *path);
 
@@ -56,23 +56,42 @@ public:
     QList<QString> remoteLs(char *url);
     QList<QString> localLs(char *path);
 
+    bool proecessIsActive() {
+        return m_processIsActive;
+    }
+
+    static int credAcquireCb(git_credential **out,
+                        const char *url,
+                        const char *username_from_url,
+                        unsigned int allowed_types,
+                        void *payload);
+
+    static int guessRefish(git_annotated_commit **out, git_repository *repo, const char *ref);
+
+    int resolveRefish(git_annotated_commit **commit, git_repository *repo, const char *refish);
+
+    static int performFastforward(git_repository *repo, const git_oid *target_oid, int is_unborn);
+
 signals:
 
     void progressChanged(int progress, QString status);
     void progressOutput(QString message);
     void finished();
-    void error(QString error);
 
 private:
     QUrl m_url;
 
     QFutureWatcher<void> m_watcher;
 
-    int m_error = 0;
-
-    QString m_errorMessage;
+    static QString m_error;
 
     static git_oid m_git_oid;
+
+    bool m_processIsActive = false;
+
+    static QString m_username;
+
+    static QString m_password;
 
 };
 

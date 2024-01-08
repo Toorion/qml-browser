@@ -200,11 +200,6 @@ void QmlView::continueLoad()
             m_api->qi()->setProgressInfoProperty("url", QVariant::fromValue(m_installationUrl->toString()));
             m_api->qi()->setProgressInfoProperty("dappUrl", QVariant::fromValue(dappUrl));
 
-            NavigationBar *navBar = (qobject_cast<MainWindow*>(window()))->navigationBar;
-            navBar->installAction->setEnabled(false);
-            connect(m_dappInstaller, &DappInstaller::finished, this, [navBar](){
-                navBar->installAction->setEnabled(true);
-            });
             connect(m_dappInstaller, &DappInstaller::progressChanged, m_api->qi(), &Qi::setProgress);
             connect(m_dappInstaller, &DappInstaller::progressOutput, m_api->qi(), [this](QString message){
                 m_api->console()->log(message);
@@ -283,6 +278,7 @@ void QmlView::indexLoaded() {
     m_component = new QQmlComponent(m_quickView->engine());
     connect(m_component, &QQmlComponent::statusChanged, this,
             &QmlView::continueLoad);
+
     m_component->setData(m_reply->readAll(), m_url);
 
     if (!m_component->errors().isEmpty()) {
@@ -301,6 +297,8 @@ void QmlView::resizeEvent(QResizeEvent *event) {
 }
 
 void QmlView::reload() {
+    m_quickView->setSource(QUrl());
+    m_api->console()->clear();
     m_quickView->engine()->clearComponentCache();
     m_networkManagerFactory.setReloading(true);
     setUrl(m_url);

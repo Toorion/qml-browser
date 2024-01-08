@@ -37,14 +37,11 @@ Item {
             font.pixelSize: 20
             font.weight: Font.DemiBold
         }
-        Button {
-            Layout.alignment: Qt.AlignHCenter
-            enabled: qi.progress = 1
-            text: "Ok"
-            onClicked: { 
-                console.log(qi.progressInfo.dappUrl);
+        QbButton {
+            enabled: qi.progress == 100
+            onClick: function() {
+                console.log('click');
                 document.location.href = qi.progressInfo.dappUrl; 
-                
             }
         }
     }

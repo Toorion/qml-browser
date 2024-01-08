@@ -27,6 +27,7 @@ SOURCES += \
     searchengine.cpp \
     tabview.cpp \
     tabwidget.cpp \
+    urllineedit.cpp \
     webpopupwindow.cpp
 
 HEADERS += \
@@ -45,6 +46,7 @@ HEADERS += \
     searchengine.h \
     tabview.h \
     tabwidget.h \
+    urllineedit.h \
     webpopupwindow.h
 
 # PWD expands to directory where project_a.pri placed.

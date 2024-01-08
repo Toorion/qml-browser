@@ -45,6 +45,7 @@ QmlDevTools::QmlDevTools(Console *console, QWidget *parent) : QWidget(parent),
     autoScrollToBottom = true;
 
     connect(console, &Console::append, this, &QmlDevTools::writeLogLine);
+    connect(console, &Console::cleared, this, &QmlDevTools::clearLog);
 
     layout->addWidget(logView);
 }
@@ -68,4 +69,9 @@ void QmlDevTools::writeLogLine(const Console::logLine *line)
     if(autoScrollToBottom) {
         logView->scrollToBottom();
     }
+}
+
+void QmlDevTools::clearLog()
+{
+    logModel->clear();
 }

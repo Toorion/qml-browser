@@ -33,6 +33,7 @@
 #include "browserpaths.h"
 #include "aboutdialog.h"
 #include "urlhelper.h"
+#include "urllineedit.h"
 
 NavigationBar::NavigationBar(QWidget *parent) : QToolBar(parent)
 {
@@ -121,23 +122,16 @@ NavigationBar::NavigationBar(QWidget *parent) : QToolBar(parent)
     /**
     * URL
     */
-    urlLineEdit = new QLineEdit(this);
+    urlLineEdit = new UrlLineEdit(this);
+    connect(urlLineEdit->installAction, &QAction::triggered, this, [=]() {
+        if (activeTabView)
+            activeTabView->installUrl(urlLineEdit->text());
+    });
+
     favAction = new QAction(this);
     urlLineEdit->addAction(favAction, QLineEdit::LeadingPosition);
     urlLineEdit->setClearButtonEnabled(true);
     addWidget(urlLineEdit);
-
-
-    /**
-     * Install
-     */
-    installAction = new QAction(this);
-    installAction->setIcon(QIcon(QStringLiteral("icons:download.svg")));
-    connect(installAction, &QAction::triggered, this, [=]() {
-        if (activeTabView)
-            activeTabView->installUrl(urlLineEdit->text());
-    });
-    addAction(installAction);
 
 
     /**

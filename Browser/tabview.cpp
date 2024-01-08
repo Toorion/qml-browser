@@ -30,7 +30,6 @@
 #include "historyitemmodel.h"
 #include "historyitem.h"
 #include <QWebEnginePage>
-#include <regex>
 #include "searchengine.h"
 #include "browserpaths.h"
 #include "urlhelper.h"
@@ -62,6 +61,8 @@ void TabView::loadUrl(const QString &rawUrl)
     QUrl url = QUrl::fromUserInput(rawUrl);
     if(!url.isValid()) {
         url = SearchEngine::searchUrl(rawUrl);
+    } else if(url.fileName().endsWith(QLatin1String(".git"), Qt::CaseInsensitive)){
+        return installUrl(rawUrl);
     }
     setUrl(url);
 }
@@ -72,6 +73,11 @@ void TabView::installUrl(const QString &rawUrl)
     if(m_installationUrl->isEmpty()) {
         // todo: Goto error page
         qWarning("Invalid URL");
+        return;
+    }
+    if(DappInstaller::instance().proecessIsActive()) {
+        // todo: Goto error page
+        qWarning("Installation already in progress");
         return;
     }
     setUrl(BrowserPaths::installPageUrl());
