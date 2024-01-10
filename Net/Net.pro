@@ -43,15 +43,14 @@ DEPENDPATH += $$PWD/../3rdparty/libgit2/include
 include(../App/App.pri)
 
 LIBS += -L$$OUT_PWD/../App/ -lApp
-LIBS += -L$$PWD/../3rdparty/libgit2/build -lgit2
-# LIBS += -L$$OUT_PWD/../libgit2 -lgit2
+win32 {
+    LIBS += -L$$PWD/../3rdparty/libgit2/build/Release -lgit2
+}
 
 # Default rules for deployment.
 unix {
     target.path = /usr/lib
+    LIBS += -L$$PWD/../3rdparty/libgit2/build -lgit2
 }
 !isEmpty(target.path): INSTALLS += target
 
-
-# QMAKE_LFLAGS += '-Wl,-rpath,\'\$$ORIGIN/../libgit2\''
-# QMAKE_RPATHDIR += $ORIGIN/../mylibs

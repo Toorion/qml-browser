@@ -91,9 +91,10 @@ int main(int argc, char *argv[])
 
     MainApplication app(argc, argv);
 
+    // Browser icons resource path
+    QDir::addSearchPath("icons", BrowserPaths::iconsPath().toLocalFile());
     // Browser styles load
-    QDir::setSearchPaths("icons", QStringList(BrowserPaths::iconsPath()));
-    QFile file(BrowserPaths::rootPath() + "/styles.qss");
+    QFile file(BrowserPaths::resolved("styles.qss").toLocalFile());
     file.open(QFile::ReadOnly);
     QString styleSheet = QLatin1String(file.readAll());
     app.setStyleSheet(styleSheet);

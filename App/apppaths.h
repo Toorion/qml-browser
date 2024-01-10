@@ -33,7 +33,9 @@ public:
 
     QString static rootPath();
 
-    QString static iconsPath();
+    QUrl static resolved(const QString path);
+
+    QUrl static iconsPath();
 
     QUrl static toolsPath();
 

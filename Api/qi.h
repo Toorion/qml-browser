@@ -27,7 +27,6 @@
 #include <QSettings>
 #include <QQmlPropertyMap>
 #include "Api_global.h"
-#include <QQmlPropertyMap>
 
 class API_EXPORT Qi : public QObject
 {
@@ -101,7 +100,7 @@ private:
 
     QString m_progressStatus;
 
-    QQmlPropertyMap *m_progressInfo = new QQmlPropertyMap();
+    QQmlPropertyMap *m_progressInfo;
 
     QString m_error;
 

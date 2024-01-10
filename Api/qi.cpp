@@ -26,7 +26,7 @@ QSettings *Qi::settings = nullptr;
 
 Qi::Qi(QObject *parent) : QObject(parent)
 {
-
+    m_progressInfo = new QQmlPropertyMap();
 }
 
 DownloadItemModel *Qi::downloadHistoryModel()
@@ -73,3 +73,4 @@ QQmlPropertyMap *Qi::settingsModel()
     QQmlEngine::setObjectOwnership(model, QQmlEngine::CppOwnership);
     return model;
 }
+

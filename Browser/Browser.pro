@@ -1,5 +1,4 @@
-QT += quick3d
-QT += core gui network widgets widgets-private quick webenginewidgets sql quickcontrols2
+QT += core gui network widgets widgets-private quick webenginewidgets sql quickcontrols2 quick3d
 
 CONFIG += c++11 # ordered
 CONFIG -= debug_and_release
@@ -76,9 +75,17 @@ else: unix:!android: target.path = /opt/$${TARGET}/bin
 LIBS += -L$$OUT_PWD/../App/ -lApp
 LIBS += -L$$OUT_PWD/../Net/ -lNet
 LIBS += -L$$OUT_PWD/../Api/ -lApi
-LIBS += -L$$PWD/../3rdparty/libgit2/build -lgit2
 
-copyfiles.commands = cp $$PWD/styles.qss $$OUT_PWD/../ && cp -r $$PWD/icons $$OUT_PWD/../ && cp -r $$PWD/../Api/tools $$OUT_PWD/../
+win32 {
+    PWD_WIN = $${PWD}
+    OUT_WIN = $${OUT_PWD}
+    PWD_WIN ~= s,/,\\,g
+    OUT_WIN ~= s,/,\\,g
+    copyfiles.commands = $$quote(cmd /c xcopy /S /I /Y $${PWD_WIN}\\..\\3rdparty\\libgit2\\build\\Release\git2.dll $${OUT_WIN} && xcopy /S /I /Y $${PWD_WIN}\\styles.qss $${OUT_WIN} && xcopy /S /I /Y $${PWD_WIN}\\icons $${OUT_WIN}\\icons && xcopy /S /I /Y $${PWD_WIN}\\..\\Api\\tools $${OUT_WIN}\\tools)
+}
+linux {
+    copyfiles.commands = cp $$PWD/styles.qss $$OUT_PWD/../ && cp -r $$PWD/icons $$OUT_PWD/../ && cp -r $$PWD/../Api/tools $$OUT_PWD/../
+}
 first.depends = $(first) copyfiles
 export(first.depends)
 export(copyfiles.commands)

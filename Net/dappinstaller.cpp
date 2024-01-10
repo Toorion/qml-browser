@@ -314,21 +314,19 @@ bool DappInstaller::mergeToHead(const char *path)
     int err = git_repository_open(&repo, path);
     if(err != 0) {
         m_error = QLatin1String("Open repository error");
-        return -1;
+        return false;
     }
 
     git_index *index;
     git_merge_analysis_t analysis;
     git_merge_preference_t preference;
-    git_reference *branch_ref = NULL;
-    git_reference *tracking_ref = NULL;
-    git_annotated_commit *our_head, *their_heads[1];
+    git_annotated_commit *their_heads[1];
 
 
     int state = git_repository_state(repo);
     if (state != GIT_REPOSITORY_STATE_NONE) {
         m_error = tr("repository is in unexpected state %1").arg(state);
-        return -1;
+        return false;
     }
 
     git_repository_fetchhead_foreach(repo, findMaster, NULL);
@@ -341,7 +339,7 @@ bool DappInstaller::mergeToHead(const char *path)
                              1);
     if (err != 0) {
         m_error = tr("merge error: %1").arg(git_error_last()->message);
-        return -1;
+        return false;
     }
 
     if (analysis & GIT_MERGE_ANALYSIS_UP_TO_DATE) {
@@ -364,7 +362,7 @@ bool DappInstaller::mergeToHead(const char *path)
     } else if (analysis & GIT_MERGE_ANALYSIS_NORMAL) {
 
         m_error = QLatin1String("Unexpected behavior");
-        return -1;
+        return false;
 /*
         git_merge_options merge_opts = GIT_MERGE_OPTIONS_INIT;
         git_checkout_options checkout_opts = GIT_CHECKOUT_OPTIONS_INIT;
@@ -392,7 +390,7 @@ bool DappInstaller::mergeToHead(const char *path)
 
     if (git_index_has_conflicts(index)) {
         m_error = QLatin1String("Index jas conflict");
-        return -1;
+        return false;
         /* Handle conflicts */
         // output_conflicts(index);
     } else {
@@ -402,11 +400,14 @@ bool DappInstaller::mergeToHead(const char *path)
 
 cleanup:
 
-    return 0;
+    return true;
 }
 
 int DappInstaller::findMaster(const char *ref_name, const char *remote_url, const git_oid *oid, unsigned int is_merge, void *payload)
 {
+    Q_UNUSED(ref_name);
+    Q_UNUSED(remote_url);
+    Q_UNUSED(payload);
     if (is_merge)
         m_git_oid = *oid;
     return 0;
@@ -439,6 +440,7 @@ int DappInstaller::sidebandProgress(const char *str, int len, void *payload)
 
 void DappInstaller::checkoutProgress(const char *path, size_t cur, size_t tot, void *payload)
 {
+    Q_UNUSED(payload);
     int progress = tot > 0
                        ? (int)((50 * cur) / tot)
                        : 0;
@@ -496,7 +498,10 @@ QList<QString> DappInstaller::localLs(char *path)
 {
     QList<QString> list;
     git_repository *repo = NULL;
-    int error = git_repository_open(&repo, path);
+    int err = git_repository_open(&repo, path);
+    if (err < 0) {
+        return list;
+    }
     git_commit *commit = NULL;
     git_revparse_single((git_object**)&commit, repo, "HEAD");
     git_strarray tag_list;
@@ -512,6 +517,7 @@ int DappInstaller::credAcquireCb(git_credential **out, const char *url, const ch
     char *privkey = NULL, *pubkey = NULL;
     int error = 1;
 
+    Q_UNUSED(allowed_types);
     Q_UNUSED(payload);
 
     if(m_password.isEmpty()) {

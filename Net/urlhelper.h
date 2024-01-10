@@ -20,6 +20,7 @@
 #define URLHELPER_H
 
 #include <QUrl>
+#include "Net_global.h"
 
 #define INTERNAL_URL_SCHEME QLatin1String("internal")
 #define DAPP_URL_SCHEME QLatin1String("dapp")
@@ -27,7 +28,7 @@
 #define HTML_MAIN_FILE QString("main.html")
 #define DIR_ALTER_SP QLatin1Char('@')
 
-class UrlHelper
+class NET_EXPORT UrlHelper
 {
 public:
     UrlHelper();

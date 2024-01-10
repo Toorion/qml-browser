@@ -35,7 +35,6 @@
 #include <QQuick3D>
 #include <QApplication>
 #include "navigationbar.h"
-#include <QQmlPropertyMap>
 #include "apppaths.h"
 #include "browsersettings.h"
 #include "urlhelper.h"
@@ -196,7 +195,6 @@ void QmlView::continueLoad()
             m_dappInstaller = &DappInstaller::instance();
 
             QUrl dappUrl = UrlHelper::gitToDappUrl(*m_installationUrl);
-            qDebug() << "DURL" << dappUrl;
             m_api->qi()->setProgressInfoProperty("url", QVariant::fromValue(m_installationUrl->toString()));
             m_api->qi()->setProgressInfoProperty("dappUrl", QVariant::fromValue(dappUrl));
 
@@ -204,7 +202,6 @@ void QmlView::continueLoad()
             connect(m_dappInstaller, &DappInstaller::progressOutput, m_api->qi(), [this](QString message){
                 m_api->console()->log(message);
             });
-            qDebug() << "PATH" << UrlHelper::urlToLocalPath(dappUrl, true).toLocalFile();
             m_dappInstaller->installOrUpdate(*m_installationUrl, UrlHelper::urlToLocalPath(dappUrl, true).toLocalFile());
             m_installationUrl = nullptr;
         }

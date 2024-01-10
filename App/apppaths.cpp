@@ -41,10 +41,16 @@ QString AppPaths::rootPath()
     return p->m_appPath.toLocalFile();
 }
 
-QString AppPaths::iconsPath()
+QUrl AppPaths::resolved(const QString path)
 {
     AppPaths* p = gs_app_paths();
-    return rootPath() + p->iconsDir;
+    return p->m_appPath.resolved(path);
+}
+
+QUrl AppPaths::iconsPath()
+{
+    AppPaths* p = gs_app_paths();
+    return p->m_appPath.resolved(p->iconsDir);
 }
 
 QUrl AppPaths::toolsPath()
@@ -55,7 +61,6 @@ QUrl AppPaths::toolsPath()
 
 QUrl AppPaths::toolPath(QUrl url)
 {
-    AppPaths* p = gs_app_paths();
     QString uri = url.adjusted(QUrl::RemoveScheme | QUrl::StripTrailingSlash).toString().remove(0,2);
     return toolsPath().resolved(uri);
 }
@@ -116,7 +121,10 @@ QUrl AppPaths::dappPath(const QUrl &internalUrl)
 
 void AppPaths::init()
 {
-    m_appPath = QUrl::fromLocalFile(QCoreApplication::applicationDirPath());
+    QString appPath = QCoreApplication::applicationDirPath();
+    if (!appPath.endsWith(QLatin1Char('/')))
+        appPath.append(QLatin1Char('/'));
+    m_appPath = QUrl::fromLocalFile(appPath);
 
 #ifndef Q_OS_WIN
     m_appPath = m_appPath.resolved(QUrl("."));

@@ -23,8 +23,9 @@
 #include <QUrl>
 #include "git2.h"
 #include <QtConcurrent>
+#include "Net_global.h"
 
-class DappInstaller : public QObject
+class NET_EXPORT DappInstaller : public QObject
 {
     Q_OBJECT
 public:
