@@ -127,7 +127,7 @@ void AppPaths::init()
     m_appPath = QUrl::fromLocalFile(appPath);
 
 #ifndef Q_OS_WIN
-    m_appPath = m_appPath.resolved(QUrl("."));
+    m_appPath = m_appPath.resolved(QUrl(".."));
 #endif
 
     m_currentProfilePath = QStandardPaths::writableLocation(QStandardPaths::AppConfigLocation);

@@ -75,6 +75,10 @@ else: unix:!android: target.path = /opt/$${TARGET}/bin
 LIBS += -L$$OUT_PWD/../App/ -lApp
 LIBS += -L$$OUT_PWD/../Net/ -lNet
 LIBS += -L$$OUT_PWD/../Api/ -lApi
+unix {
+    target.path = /usr/lib
+    LIBS += -L$$PWD/../3rdparty/libgit2/build -lgit2
+}
 
 win32 {
     PWD_WIN = $${PWD}
