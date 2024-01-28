@@ -41,13 +41,14 @@ make && make install
 ### Windows
 
 Use QtCreator to build 
+
 Kit QT + MSVC2019
 
 ## Demo
 
-[QML Demo page](http://demo.qbqsoft.com)
+[QML Demo page *](http://demo.qbqsoft.com)
 
-[QML Demo source *](https://github.com/Toorion/qml-browser-demo)
+[QML Demo source](https://github.com/Toorion/qml-browser-demo)
 
 \* Can only be opened using QmlBrowser
 
