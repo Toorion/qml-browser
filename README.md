@@ -48,7 +48,7 @@ Kit QT + MSVC2019
 
 ## Demo
 
-http://demo.qbqsoft.com *
+http[]()://demo.qbqsoft.com *
 
 [QML Demo source](https://github.com/Toorion/qml-browser-demo)
 
