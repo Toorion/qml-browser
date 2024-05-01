@@ -1,5 +1,7 @@
 # QmlBrowser
 
+[![Donate](https://img.shields.io/badge/Donate-PayPal-green.svg)](https://paypal.me/toorion)
+
 QmlBrowser is full-featured Chromium based open-source web browser
 with QML SDAPPS (Serverless Decentralized Application) support.
 
