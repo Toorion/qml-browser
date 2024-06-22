@@ -70,6 +70,7 @@ public Q_SLOTS:
     void tabUrlChanged(const QUrl url);
     void tabLoadFinished(bool ok);
     void tabIconUrlChanged(const QUrl iconUrl);
+    void navigationRequested(const QUrl url);
 
 signals:
     void titleChanged(const QString &title);

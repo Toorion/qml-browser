@@ -54,6 +54,7 @@ public Q_SLOTS:
     void reload() override;
 
 signals:
+    void clickEmitted(const QUrl url);
     void devToolsRequested(QWebEnginePage *source);
 
 protected:

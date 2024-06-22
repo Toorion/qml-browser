@@ -53,6 +53,7 @@ TabView::~TabView()
 {
     if(m_pageView) {
         delete m_pageView;
+        m_pageView = nullptr;
     }
 }
 
@@ -162,6 +163,11 @@ void TabView::tabIconUrlChanged(const QUrl iconUrl)
         m_historyItem->setIconUrl(iconUrl);
         HistoryItemModel::instance().updateHistoryItem(m_historyItem);
     }
+}
+
+void TabView::navigationRequested(const QUrl url)
+{
+    setUrl(url);
 }
 
 

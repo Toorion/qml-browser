@@ -41,7 +41,6 @@ void NetworkAccessManagerFactory::setMaxCacheSize(qint64 size)
 void NetworkAccessManagerFactory::enableCache(QString cacheDir, QObject *parent)
 {
     m_cache = new NetworkDiskCache(cacheDir, parent);
-
 }
 
 void NetworkAccessManagerFactory::setUserAgent(const QString userAgent)

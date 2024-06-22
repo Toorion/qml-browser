@@ -50,7 +50,8 @@ NetworkDiskCache *NetworkDiskCache::self = nullptr;
     QAbstractNetworkCache's constructor.
  */
 NetworkDiskCache::NetworkDiskCache(QString cacheDir, QObject *parent)
-    : QAbstractNetworkCache(*new NetworkDiskCachePrivate, parent)
+    : QAbstractNetworkCache(*new NetworkDiskCachePrivate, parent),
+    m_cacheDir(cacheDir)
 {
     self = this;
 }

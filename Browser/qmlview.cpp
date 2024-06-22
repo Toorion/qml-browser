@@ -45,8 +45,6 @@ QmlView::QmlView(QSplitter *splitter, QWidget *parent)
     : QWidget(parent)
     , BaseView(splitter)
 {
-    m_parent = parent;
-
     m_quickView = new QQuickView(&m_qmlEngine, qobject_cast<QWindow*>(window()));
     m_quickView->setResizeMode(QQuickView::SizeRootObjectToView);
 

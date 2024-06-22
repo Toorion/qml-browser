@@ -23,11 +23,20 @@
 #include <QSplitter>
 #include "browser.h"
 #include "tabview.h"
+#include <QWebEngineNavigationRequest>
 
 
 HtmlView::HtmlView(QSplitter *splitter, QWidget *parent, QWebEngineProfile *profile) : QWebEngineView(profile, parent), BaseView(splitter)
 {
     QWebEnginePage *webPage = new QWebEnginePage(profile, this);
+    connect(webPage, &QWebEnginePage::navigationRequested, this, [this](QWebEngineNavigationRequest &request){
+        if(request.navigationType() == QWebEngineNavigationRequest::LinkClickedNavigation) {
+            emit clickEmitted(request.url());
+            request.reject();
+            return;
+        }
+        request.accept();
+    });
     setPage(webPage);
 
     connect(this, &QWebEngineView::titleChanged, dynamic_cast<TabView*>(parent), &TabView::titleChanged);
@@ -36,6 +45,7 @@ HtmlView::HtmlView(QSplitter *splitter, QWidget *parent, QWebEngineProfile *prof
     connect(this, &QWebEngineView::loadFinished, dynamic_cast<TabView*>(parent), &TabView::tabLoadFinished);
     connect(this, &QWebEngineView::iconUrlChanged, dynamic_cast<TabView*>(parent), &TabView::tabIconUrlChanged);
     connect(this, &QWebEngineView::loadProgress, dynamic_cast<TabView*>(parent), &TabView::loadProgress);
+    connect(this, &HtmlView::clickEmitted, dynamic_cast<TabView*>(parent), &TabView::navigationRequested);
 }
 
 HtmlView::~HtmlView()

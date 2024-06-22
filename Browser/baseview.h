@@ -60,8 +60,6 @@ protected:
 
     QSplitter *m_splitter;
 
-    QWidget *m_parent;
-
 };
 
 #endif // BASEVIEW_H
