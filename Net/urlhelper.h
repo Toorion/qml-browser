@@ -41,6 +41,8 @@ public:
 
     QString static urlLocalPath(const QUrl &url);
 
+    QString static urlLocalDataPath(const QUrl &url);
+
     QUrl static gitToDappUrl(const QUrl &url);
 
 

@@ -50,6 +50,10 @@ public:
 
     const QUrl iconUrl() override;
 
+    void navTyped(const QString &text) override {
+        Q_UNUSED(text);
+    };
+
 public Q_SLOTS:
     void reload() override;
 

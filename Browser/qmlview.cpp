@@ -34,7 +34,6 @@
 #include <QVBoxLayout>
 #include <QQuick3D>
 #include <QApplication>
-#include "navigationbar.h"
 #include "apppaths.h"
 #include "browsersettings.h"
 #include "urlhelper.h"
@@ -132,7 +131,7 @@ void QmlView::continueLoad()
     if(m_component->status() == QQmlComponent::Ready) {
 
         // set LocalStorage path per host / dapps
-        m_qmlEngine.setOfflineStoragePath(UrlHelper::urlLocalPath(m_url));
+        m_qmlEngine.setOfflineStoragePath(UrlHelper::urlLocalDataPath(m_url));
 
         m_context = new QQmlContext(m_quickView->engine()->rootContext());
 
@@ -264,6 +263,11 @@ const QString QmlView::title()
 const QUrl QmlView::iconUrl()
 {
     return m_iconUrl;
+}
+
+void QmlView::navTyped(const QString &text)
+{
+    m_api->setNavInput(text);
 }
 
 void QmlView::indexLoaded() {

@@ -53,6 +53,8 @@ public:
 
     void loadFinished();
 
+    void navTyped(const QString &text);
+
     QUrl getCurrentUrl() {
         return m_currentUrl;
     };

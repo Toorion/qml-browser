@@ -25,12 +25,14 @@
 #include "document.h"
 #include "locationurl.h"
 #include "Api_global.h"
+#include "qmlvalue.h"
 
 class API_EXPORT ApiWeb : public ApiCommon
 {
     Q_OBJECT
     Q_PROPERTY(Document *document READ document CONSTANT)
     Q_PROPERTY(Window *window READ window CONSTANT)
+    Q_PROPERTY(QmlValue *navInput READ navInput CONSTANT)
 
 public:
 
@@ -51,6 +53,17 @@ public:
         m_baseUrl = url;
     }
 
+    QmlValue *navInput()
+    {
+        return m_navInput;
+    }
+
+    void setNavInput(const QString &text) {
+        m_navInput->setValue(new QVariant(text));
+    }
+
+signals:
+
 private:
 
     Document *m_document;
@@ -58,6 +71,8 @@ private:
     Window *m_window;
 
     LocationUrl *m_locationUrl;
+
+    QmlValue *m_navInput;
 
 };
 

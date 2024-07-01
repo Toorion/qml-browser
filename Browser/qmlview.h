@@ -64,6 +64,8 @@ public:
 
     const QUrl iconUrl() override;
 
+    void navTyped(const QString &text) override;
+
     void setInstallationUrl(QUrl *url) {
         m_installationUrl = url;
     };

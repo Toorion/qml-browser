@@ -29,4 +29,7 @@ ApiWeb::ApiWeb(NetworkAccessManagerFactory *networkManagerFactory, QObject *pare
     m_window->location.setLocationUrl(m_locationUrl);
 
     m_document->location.setLocationUrl(m_locationUrl);
+
+    m_navInput = new QmlValue(this);
+    m_navInput->setValue(new QVariant(""));
 }

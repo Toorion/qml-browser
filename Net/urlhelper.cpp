@@ -81,6 +81,16 @@ QUrl UrlHelper::assertFilename(const QUrl &url)
 QString UrlHelper::urlLocalPath(const QUrl &url)
 {
     if(url.scheme().compare(INTERNAL_URL_SCHEME) == 0) {
+        return AppPaths::dataPath();
+    } else if (url.scheme().compare(DAPP_URL_SCHEME) == 0) {
+        return AppPaths::dappPath(url).toLocalFile();
+    }
+    return AppPaths::webAppPath(url);
+}
+
+QString UrlHelper::urlLocalDataPath(const QUrl &url)
+{
+    if(url.scheme().compare(INTERNAL_URL_SCHEME) == 0) {
         return AppPaths::toolPath(url).toLocalFile();
     } else if (url.scheme().compare(DAPP_URL_SCHEME) == 0) {
         return AppPaths::dappPath(url).toLocalFile();

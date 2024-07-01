@@ -28,6 +28,7 @@ SOURCES += \
     location.cpp \
     locationurl.cpp \
     qi.cpp \
+    qmlvalue.cpp \
     tools.cpp \
     window.cpp
 
@@ -50,6 +51,7 @@ HEADERS += \
     location.h \
     locationurl.h \
     qi.h \
+    qmlvalue.h \
     tools.h \
     window.h
 

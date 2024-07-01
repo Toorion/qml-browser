@@ -127,6 +127,10 @@ NavigationBar::NavigationBar(QWidget *parent) : QToolBar(parent)
         if (activeTabView)
             activeTabView->installUrl(urlLineEdit->text());
     });
+    connect(urlLineEdit, &UrlLineEdit::textEdited, this, [=](const QString text){
+        if (activeTabView)
+            activeTabView->navTyped(text);
+    });
 
     favAction = new QAction(this);
     urlLineEdit->addAction(favAction, QLineEdit::LeadingPosition);

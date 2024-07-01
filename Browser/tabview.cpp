@@ -139,6 +139,13 @@ void TabView::loadFinished()
     m_reply->deleteLater();
 }
 
+void TabView::navTyped(const QString &text)
+{
+    if(pageView()) {
+        m_pageView->navTyped(text);
+    }
+}
+
 
 void TabView::tabUrlChanged(const QUrl url)
 {

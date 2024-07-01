@@ -56,6 +56,8 @@ public:
 
     virtual void reload() = 0;
 
+    virtual void navTyped(const QString &text) = 0;
+
 protected:
 
     QSplitter *m_splitter;
