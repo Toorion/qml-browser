@@ -15,7 +15,10 @@ SOURCES += \
     api.cpp \
     apicommon.cpp \
     apiweb.cpp \
-    console.cpp \
+    bookmarkdb.cpp \
+    bookmarkitem.cpp \
+    bookmarkitemmodel.cpp \
+    bookmarktreemodel.cpp \
     document.cpp \
     downloadbutton.cpp \
     downloaddb.cpp \
@@ -27,6 +30,7 @@ SOURCES += \
     historyitemmodel.cpp \
     location.cpp \
     locationurl.cpp \
+    log.cpp \
     qi.cpp \
     qmlvalue.cpp \
     tools.cpp \
@@ -38,7 +42,10 @@ HEADERS += \
     api.h \
     apicommon.h \
     apiweb.h \
-    console.h \
+    bookmarkdb.h \
+    bookmarkitem.h \
+    bookmarkitemmodel.h \
+    bookmarktreemodel.h \
     document.h \
     downloadbutton.h \
     downloaddb.h \
@@ -50,6 +57,7 @@ HEADERS += \
     historyitemmodel.h \
     location.h \
     locationurl.h \
+    log.h \
     qi.h \
     qmlvalue.h \
     tools.h \

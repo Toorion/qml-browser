@@ -61,13 +61,14 @@ QmlView::QmlView(QSplitter *splitter, QWidget *parent)
     m_networkManagerFactory.setUserAgent(browserSettings->appUserAgent());
     m_quickView->engine()->setNetworkAccessManagerFactory(&m_networkManagerFactory);
     m_api = new ApiWeb(&m_networkManagerFactory);
+    m_qmlEngine.globalObject().setProperty("log", m_qmlEngine.newQObject(m_api->log()));
 
     DownloadManagerWidget *downloadManager = (qobject_cast<MainWindow*>(window()))->downloadManagerWidget();
     m_api->qi()->setDownloadManagerWidget(downloadManager);
 
     QObject::connect(m_quickView->engine(), &QQmlApplicationEngine::warnings, this, [=] (const QList<QQmlError> &warnings) mutable {
         foreach (const QQmlError &error, warnings) {
-            m_api->console()->error(error.toString());
+            m_api->log()->error(error.toString());
         }
     });
 
@@ -121,7 +122,7 @@ void QmlView::setContent(const QByteArray &content, const QString &mimeType, con
 
     if (!m_component->errors().isEmpty()) {
         foreach (const QQmlError &error, m_component->errors()) {
-            m_api->console()->error(error.toString());
+            m_api->log()->error(error.toString());
         }
     }
 }
@@ -155,7 +156,7 @@ void QmlView::continueLoad()
         QObject *component = m_component->beginCreate(m_context);
         m_contentItem = qobject_cast<QQuickItem*>(component);
         if(!m_contentItem) {
-            m_api->console()->error(tr("Wrong root object type [%1], instance of Item awaiting").arg(component->metaObject()->className()));
+            m_api->log()->error(tr("Wrong root object type [%1], instance of Item awaiting").arg(component->metaObject()->className()));
             return;
         }
         m_component->completeCreate();
@@ -197,7 +198,7 @@ void QmlView::continueLoad()
 
             connect(m_dappInstaller, &DappInstaller::progressChanged, m_api->qi(), &Qi::setProgress);
             connect(m_dappInstaller, &DappInstaller::progressOutput, m_api->qi(), [this](QString message){
-                m_api->console()->log(message);
+                m_api->log()->debug(message);
             });
             m_dappInstaller->installOrUpdate(*m_installationUrl, UrlHelper::urlToLocalPath(dappUrl, true).toLocalFile());
             m_installationUrl = nullptr;
@@ -206,7 +207,7 @@ void QmlView::continueLoad()
 
     if (!m_component->errors().isEmpty()) {
         foreach (const QQmlError &error, m_component->errors()) {
-            m_api->console()->error(error.toString());
+            m_api->log()->error(error.toString());
         }
     }
 
@@ -247,7 +248,7 @@ void QmlView::toggleDevTools()
         delete m_devTools;
         m_devTools = nullptr;
     } else {
-        m_devTools = new QmlDevTools(m_api->console(), this);
+        m_devTools = new QmlDevTools(m_api->log(), this);
         m_splitter->setStretchFactor(0,3);
         m_splitter->setStretchFactor(1,1);
         m_splitter->addWidget(m_devTools);
@@ -282,7 +283,7 @@ void QmlView::indexLoaded() {
 
     if (!m_component->errors().isEmpty()) {
         foreach (const QQmlError &error, m_component->errors()) {
-            m_api->console()->error(error.toString());
+            m_api->log()->error(error.toString());
         }
     }
 }
@@ -297,7 +298,7 @@ void QmlView::resizeEvent(QResizeEvent *event) {
 
 void QmlView::reload() {
     m_quickView->setSource(QUrl());
-    m_api->console()->clear();
+    m_api->log()->clear();
     m_quickView->engine()->clearComponentCache();
     m_networkManagerFactory.setReloading(true);
     setUrl(m_url);

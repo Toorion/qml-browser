@@ -27,6 +27,7 @@
 #include <QSettings>
 #include <QQmlPropertyMap>
 #include "Api_global.h"
+#include "bookmarkitemmodel.h"
 
 class API_EXPORT Qi : public QObject
 {
@@ -36,6 +37,7 @@ public:
 
     Q_INVOKABLE DownloadItemModel *downloadHistoryModel();
     Q_INVOKABLE HistoryItemModel *visitHistoryModel();
+    Q_INVOKABLE BookmarkItemModel *bookmarkModel();
     Q_INVOKABLE QQmlPropertyMap *settingsModel();
 
     Q_PROPERTY(int progress READ progress NOTIFY progressChanged)

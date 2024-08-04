@@ -29,6 +29,8 @@
 #include "browserpaths.h"
 #include "historyitem.h"
 #include "historyitemmodel.h"
+#include "bookmarkitem.h"
+#include "bookmarkitemmodel.h"
 #include "qi.h"
 #include "dynamicobject.h"
 #include <QDir>
@@ -120,6 +122,8 @@ int main(int argc, char *argv[])
     qRegisterMetaType<DownloadItemModel*>();
     qRegisterMetaType<HistoryItem*>();
     qRegisterMetaType<HistoryItemModel*>();
+    qRegisterMetaType<BookmarkItem*>();
+    qRegisterMetaType<BookmarkItemModel*>();
     qRegisterMetaType<DynamicObject*>();
     qRegisterMetaType<QQmlPropertyMap*>();
 

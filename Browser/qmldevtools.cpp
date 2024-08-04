@@ -24,8 +24,8 @@
 #include <QBrush>
 #include <QColor>
 
-QmlDevTools::QmlDevTools(Console *console, QWidget *parent) : QWidget(parent),
-    console(console)
+QmlDevTools::QmlDevTools(Log *log, QWidget *parent) : QWidget(parent),
+    log(log)
 {
     layout = new QVBoxLayout(this);
     layout->setSpacing(0);
@@ -33,7 +33,7 @@ QmlDevTools::QmlDevTools(Console *console, QWidget *parent) : QWidget(parent),
     setLayout(layout);
 
     logModel = new QStandardItemModel;
-    QList <Console::logLine> records = console->logRecords();
+    QList <Log::logLine> records = log->logRecords();
     for (int i = 0; i < records.count(); ++i) {
         writeLogLine(&records.at(i));
     }
@@ -44,22 +44,22 @@ QmlDevTools::QmlDevTools(Console *console, QWidget *parent) : QWidget(parent),
 
     autoScrollToBottom = true;
 
-    connect(console, &Console::append, this, &QmlDevTools::writeLogLine);
-    connect(console, &Console::cleared, this, &QmlDevTools::clearLog);
+    connect(log, &Log::append, this, &QmlDevTools::writeLogLine);
+    connect(log, &Log::cleared, this, &QmlDevTools::clearLog);
 
     layout->addWidget(logView);
 }
 
 
-void QmlDevTools::writeLogLine(const Console::logLine *line)
+void QmlDevTools::writeLogLine(const Log::logLine *line)
 {
     QList<QStandardItem *> listItem;
     QStandardItem *item = new QStandardItem();
     item->setText(line->text);
 
-    if(Console::lineType::L_LOG == line->type) {
+    if(Log::lineType::L_DEBUG == line->type) {
         item->setForeground(QBrush(QColor(140,140,140)));
-    } else if(Console::lineType::L_ERROR == line->type) {
+    } else if(Log::lineType::L_ERROR == line->type) {
         item->setForeground(QBrush(QColor(255,0,0)));
     }
 

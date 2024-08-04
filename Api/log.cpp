@@ -16,53 +16,39 @@
 * You should have received a copy of the GNU General Public License
 * along with this program.  If not, see <http://www.gnu.org/licenses/>.
 ****************************************************************************/
-#ifndef CONSOLE_H
-#define CONSOLE_H
+#include "log.h"
 
-#include <QObject>
-#include <QString>
-#include <QList>
-#include <QMap>
-#include "Api_global.h"
-
-class API_EXPORT Console : public QObject
+Log::Log(QObject *parent) : QObject(parent)
 {
-    Q_OBJECT
-public:
-    explicit Console(QObject *parent = nullptr);
 
-    Q_INVOKABLE void log(const QString message);
+}
 
-    Q_INVOKABLE void error(const QString message);
-
-    void clear();
-
-    enum lineType {
-        L_ERROR,
-        L_LOG
-    };
-    Q_ENUM(lineType);
-
-    struct logLine {
-        QString text;
-        lineType type;
-    };
+void Log::debug(const QString message)
+{
+    write(message, lineType::L_DEBUG);
+}
 
 
-    QList<logLine> logRecords();
+void Log::error(const QString message)
+{
+    write(message, lineType::L_ERROR);
+}
 
-signals:
+void Log::clear()
+{
+    logList.clear();
+    emit cleared();
+}
 
-    void append(Console::logLine *line);
-    void cleared();
+QList<Log::logLine> Log::logRecords()
+{
+    return logList;
+}
 
+void Log::write(const QString message, const Log::lineType type)
+{
+    logLine line = logLine{message, type};
+    logList << line;
+    emit append(&line);
+}
 
-private:
-
-    void write(const QString message, const lineType type);
-
-    QList<logLine> logList;
-
-};
-
-#endif // CONSOLE_H

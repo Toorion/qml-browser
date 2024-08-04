@@ -30,7 +30,7 @@ ApiCommon::ApiCommon(NetworkAccessManagerFactory *networkManagerFactory, QObject
       m_networkManagerFactory(networkManagerFactory)
 {
     m_qi = new Qi(this);
-    m_console = new Console(this);
+    m_log = new Log(this);
 }
 
 void ApiCommon::alert(const QString message, const QString title)
@@ -85,7 +85,7 @@ QString ApiCommon::preload(const QString inputUrl)
     loop.exec();
 
     if(reply->error() != QNetworkReply::NoError) {
-        m_console->error(QLatin1String("File %1 load error").arg(url.toString()));
+        m_log->error(QLatin1String("File %1 load error").arg(url.toString()));
     }
 
     reply->close();

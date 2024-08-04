@@ -37,7 +37,7 @@ DownloadItemModel *Qi::downloadHistoryModel()
     if(apiCommon->accessRights()->allowDownloadsHistory) {
         model = m_downloadManagerWidget->downloadItemModel();
     } else {
-        apiCommon->console()->error("Access to download history deny");
+        apiCommon->log()->error("Access to download history deny");
         model = new DownloadItemModel();
     }
     QQmlEngine::setObjectOwnership(model, QQmlEngine::CppOwnership);
@@ -52,11 +52,27 @@ HistoryItemModel *Qi::visitHistoryModel()
     if(apiCommon->accessRights()->allowVisitHitory) {
         model = &HistoryItemModel::instance();
     } else {
-        apiCommon->console()->error("Access to visit history deny");
+        apiCommon->log()->error("Access to visit history deny");
         model = new HistoryItemModel(this);
     }
     QQmlEngine::setObjectOwnership(model, QQmlEngine::CppOwnership);
     return model;
+}
+
+BookmarkItemModel *Qi::bookmarkModel()
+{
+    ApiCommon *apiCommon = qobject_cast<ApiCommon*>(parent());
+
+    BookmarkItemModel *model;
+    if(apiCommon->accessRights()->allowBookmark) {
+        model = &BookmarkItemModel::instance();
+    } else {
+        apiCommon->log()->error("Access to bookmark deny");
+        model = new BookmarkItemModel(this);
+    }
+    QQmlEngine::setObjectOwnership(model, QQmlEngine::CppOwnership);
+    return model;
+
 }
 
 QQmlPropertyMap *Qi::settingsModel()
@@ -67,7 +83,7 @@ QQmlPropertyMap *Qi::settingsModel()
     if(apiCommon->accessRights()->allowSetings) {
         model = new DynamicObject(Qi::settings, this);
     } else {
-        apiCommon->console()->error("Access to settings deny");
+        apiCommon->log()->error("Access to settings deny");
         model = new DynamicObject(new QObject(), this);
     }
     QQmlEngine::setObjectOwnership(model, QQmlEngine::CppOwnership);

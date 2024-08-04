@@ -34,6 +34,7 @@
 #include "aboutdialog.h"
 #include "urlhelper.h"
 #include "urllineedit.h"
+#include <QPushButton>
 
 NavigationBar::NavigationBar(QWidget *parent) : QToolBar(parent)
 {
@@ -136,6 +137,31 @@ NavigationBar::NavigationBar(QWidget *parent) : QToolBar(parent)
     urlLineEdit->addAction(favAction, QLineEdit::LeadingPosition);
     urlLineEdit->setClearButtonEnabled(true);
     addWidget(urlLineEdit);
+
+
+    /**
+     * Bookmark
+     */
+    QPushButton *bookmarkButton = new QPushButton(this);
+    bookmarkButton->setObjectName("BookmarkButton");
+    bookmarkButton->setToolTip(tr("Bookmark"));
+    bookmarkButton->setContextMenuPolicy(Qt::CustomContextMenu);
+    addWidget(bookmarkButton);
+
+    QMenu *bookmarkMenu=new QMenu(bookmarkButton);
+    //bookmarkButton->setMenu(bookmarkMenu);
+
+    connect(bookmarkButton, &QPushButton::customContextMenuRequested, this, [this, bookmarkMenu, bookmarkButton]() {
+        QPoint globalPos = mapToGlobal(bookmarkButton->pos());
+        globalPos.setY(globalPos.ry() + bookmarkButton->height());
+        bookmarkMenu->popup(globalPos);
+    });
+
+
+    // New tab
+    newTabAction = new QAction("New tab", this);
+    newTabAction->setShortcut(QKeySequence(Qt::CTRL | Qt::Key_T));
+    bookmarkMenu->addAction(newTabAction);
 
 
     /**

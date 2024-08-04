@@ -35,10 +35,13 @@ public:
 
     bool allowSetings = false;
 
+    bool allowBookmark = false;
+
     void allowAllInternalAccess() {
         allowDownloadsHistory = true;
         allowVisitHitory = true;
         allowSetings = true;
+        allowBookmark = true;
     };
 
 

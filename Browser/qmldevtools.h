@@ -21,7 +21,7 @@
 
 #include <QWidget>
 #include <QVBoxLayout>
-#include <console.h>
+#include <log.h>
 #include <QListView>
 #include <QStandardItemModel>
 
@@ -29,17 +29,17 @@ class QmlDevTools : public QWidget
 {
     Q_OBJECT
 public:
-    explicit QmlDevTools(Console *console, QWidget *parent = nullptr);
+    explicit QmlDevTools(Log *log, QWidget *parent = nullptr);
 
 public Q_SLOTS:
-    void writeLogLine(const Console::logLine *line);
+    void writeLogLine(const Log::logLine *line);
 
     void clearLog();
 
 private:
     QVBoxLayout *layout;
 
-    Console *console;
+    Log *log;
 
     QListView *logView;
 

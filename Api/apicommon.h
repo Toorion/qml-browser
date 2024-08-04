@@ -20,7 +20,7 @@
 #define APICOMMON_H
 
 #include <QObject>
-#include "console.h"
+#include "log.h"
 #include "qi.h"
 #include "downloaditem.h"
 #include "accessrights.h"
@@ -31,13 +31,13 @@
 class API_EXPORT ApiCommon : public QObject
 {
     Q_OBJECT
-    Q_PROPERTY(Console *console READ console CONSTANT)
+    Q_PROPERTY(Log *log READ log CONSTANT)
     Q_PROPERTY(Qi *qi READ qi CONSTANT)
 
 public:
     explicit ApiCommon(NetworkAccessManagerFactory *networkManagerFactory, QObject *parent = nullptr);
 
-    Console *console() {return m_console;}
+    Log *log() {return m_log;}
 
     Qi *qi() {return m_qi;}
 
@@ -62,7 +62,7 @@ protected:
     QUrl m_baseUrl;
 
 private:
-    Console *m_console;
+    Log *m_log;
 
     Qi *m_qi;
 

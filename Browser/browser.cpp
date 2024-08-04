@@ -23,12 +23,14 @@
 #include "historydb.h"
 #include "historyitemmodel.h"
 #include "browsersettings.h"
+#include "bookmarkdb.h"
+#include "bookmarkitemmodel.h"
 
 
 Browser::Browser()
 {
-    HistoryItemModel *historyItemModel = &HistoryItemModel::instance();
-    historyItemModel->fill(HistoryDb::list());
+    HistoryItemModel::instance().fill(HistoryDb::list());
+    BookmarkItemModel::instance().fill(BookmarkDb::list());
 
     QObject::connect(QWebEngineProfile::defaultProfile(), &QWebEngineProfile::downloadRequested,
                      this, [=] (QWebEngineDownloadRequest *item) {
