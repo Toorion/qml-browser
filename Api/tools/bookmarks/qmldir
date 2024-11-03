@@ -1,4 +1,7 @@
+TreeFilterModel ../common/TreeFilterModel.qml
 SortFilterModel ../common/SortFilterModel.qml
 QbButton ../common/qbbutton.qml
 MomentumAnimation ../common/MomentumAnimation.qml
 ResizableBox ../common/ResizableBox.qml
+FolderForm FolderForm.qml
+LinksView LinksView.qml

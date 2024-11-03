@@ -15,6 +15,9 @@ SOURCES += \
     browser.cpp \
     browserpaths.cpp \
     browsersettings.cpp \
+    completerheader.cpp \
+    completermodel.cpp \
+    completerrow.cpp \
     downloaditemproxy.cpp \
     htmlview.cpp \
     main.cpp \
@@ -35,6 +38,9 @@ HEADERS += \
     browser.h \
     browserpaths.h \
     browsersettings.h \
+    completerheader.h \
+    completermodel.h \
+    completerrow.h \
     downloaditemproxy.h \
     htmlview.h \
     mainwindow.h \

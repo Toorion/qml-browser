@@ -29,7 +29,6 @@
 #include "downloaditem.h"
 #include "downloaditemproxy.h"
 #include "browserpaths.h"
-#include <regex>
 #include <QScreen>
 #include "urlhelper.h"
 #include <QPixmap>
@@ -41,9 +40,8 @@ MainWindow::MainWindow(QWebEngineProfile *profile)
 {
     setObjectName("QUI-BrowserWindow");
 
-    QPixmap qbqb3("icons:qbqb3.svg");
-
-    setWindowIcon(QIcon(qbqb3));
+    // QPixmap qbqb3("icons:qbqb3.svg");
+    // setWindowIcon(QIcon(qbqb3));
     setAttribute(Qt::WA_DeleteOnClose, true);
     setFocusPolicy(Qt::ClickFocus);
 

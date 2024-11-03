@@ -37,6 +37,7 @@
 #include "apppaths.h"
 #include "browsersettings.h"
 #include "urlhelper.h"
+#include "bookmarklinkmodel.h"
 
 
 
@@ -137,7 +138,7 @@ void QmlView::continueLoad()
         m_context = new QQmlContext(m_quickView->engine()->rootContext());
 
         AccessRights *accessRights = new AccessRights();
-        if(m_url.scheme().compare(INTERNAL_URL_SCHEME) == 0) {
+        if(m_url.scheme().compare(INTERNAL_URL_SCHEME, Qt::CaseInsensitive) == 0) {
             accessRights->allowAllInternalAccess();
         }
         m_api->setAccessRights(accessRights);
@@ -168,6 +169,10 @@ void QmlView::continueLoad()
         if(m_contentItem->property("title").isValid()) {
             m_title = m_contentItem->property("title").toString();
             emit titleChanged(m_contentItem->property("title").toString());
+        }
+
+        if(m_contentItem->property("description").isValid()) {
+            m_description = m_contentItem->property("description").toString();
         }
 
         if(m_contentItem->property("favicon").isValid()) {
@@ -266,9 +271,19 @@ const QUrl QmlView::iconUrl()
     return m_iconUrl;
 }
 
+const QString QmlView::description()
+{
+    return m_description;
+}
+
 void QmlView::navTyped(const QString &text)
 {
     m_api->setNavInput(text);
+}
+
+bool QmlView::addToBookmark()
+{
+    return BookmarkLinkModel::addNewItem(m_title, m_url, m_iconUrl, "", description());
 }
 
 void QmlView::indexLoaded() {

@@ -24,6 +24,9 @@
 #include <QVariant>
 #include <QSqlError>
 #include <QSqlDatabase>
+#include <QSqlRecord>
+
+QMap<QLatin1String,QSqlDatabase*> AppDb::m_dbs = {};
 
 AppDb::AppDb() : QObject()
 {
@@ -33,6 +36,17 @@ AppDb::AppDb() : QObject()
 const QString AppDb::dbFullName()
 {
     return QDir(AppPaths::dbPath()).filePath(m_dbName);
+}
+
+const QVariantMap AppDb::queryToMap(QSqlQuery *query)
+{
+    QVariantMap map;
+    for (int i = 0; i < query->record().count(); i++) {
+        QString fieldName = query->record().fieldName(i);
+        QVariant value = query->value(i);
+        map.insert(fieldName, value);
+    }
+    return map;
 }
 
 bool AppDb::connect()
@@ -49,12 +63,18 @@ bool AppDb::connect()
 
 bool AppDb::open()
 {
+    if (m_dbs.contains(m_dbName)) {
+        m_db = *m_dbs.value(m_dbName);
+        return true;
+    }
+
     m_db = QSqlDatabase::addDatabase("QSQLITE", m_dbName + "Connection");
     m_db.setDatabaseName(dbFullName());
     bool isOpen = m_db.open();
     if(!isOpen) {
         queryError("Open", m_db.lastError().text());
     }
+    m_dbs.insert(m_dbName, &m_db);
     return isOpen;
 }
 
@@ -65,8 +85,13 @@ void AppDb::close()
 
 bool AppDb::queryError(const QString command, const QString error)
 {
+    return queryError(m_tableName, command, error);
+}
+
+bool AppDb::queryError(const QLatin1String tableName, const QString command, const QString error)
+{
     qWarning("DB Error, %s", dbFullName().toLocal8Bit().data());
-    qWarning("Table: %s", m_tableName.data());
+    qWarning("Table: %s", tableName.data());
     qWarning("Command: %s", command.toLocal8Bit().data());
     qWarning("With error: %s", error.toLocal8Bit().data());
     return false;
@@ -74,13 +99,18 @@ bool AppDb::queryError(const QString command, const QString error)
 
 bool AppDb::removeRecord(const int id)
 {
+    return removeRecord(m_tableName, id);
+}
+
+bool AppDb::removeRecord(const QLatin1String tableName, const int id)
+{
     QSqlQuery query(m_db);
 
-    query.prepare("DELETE FROM " + m_tableName + " WHERE id= :ID ;");
+    query.prepare("DELETE FROM " + tableName + " WHERE id= :ID ;");
     query.bindValue(":ID", id);
 
     if(!query.exec()){
-        return queryError("remove", query.lastError().text());
+        return queryError(tableName, "remove", query.lastError().text());
     }
     return true;
 }

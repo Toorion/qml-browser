@@ -1,15 +1,13 @@
-#ifndef BOOKMARKITEM_H
-#define BOOKMARKITEM_H
+#ifndef BOOKMARKLINKITEM_H
+#define BOOKMARKLINKITEM_H
 
-#include <QVariantList>
 #include "Api_global.h"
+#include <QVariantList>
 
-class API_EXPORT BookmarkItem
+class API_EXPORT BookmarkLinkItem
 {
-
 public:
-    explicit BookmarkItem(QVariantMap data);
-
+    explicit BookmarkLinkItem(QVariantMap data);
     static const QList<QByteArray> fields();
 
     QVariant data(int column) const;
@@ -23,7 +21,6 @@ public:
 
     void setId(int id);
 
-signals:
 
 private:
 
@@ -31,4 +28,4 @@ private:
 
 };
 
-#endif // BOOKMARKITEM_H
+#endif // BOOKMARKLINKITEM_H

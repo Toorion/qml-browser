@@ -30,7 +30,6 @@
 #include <QIcon>
 #include <QWebEngineProfile>
 #include "historyitem.h"
-#include "networkaccessmanagerfactory.h"
 
 class TabView : public QWidget
 {
@@ -55,7 +54,9 @@ public:
 
     void navTyped(const QString &text);
 
-    QUrl getCurrentUrl() {
+    bool addToBookmark();
+
+    QUrl currentUrl() {
         return m_currentUrl;
     };
 

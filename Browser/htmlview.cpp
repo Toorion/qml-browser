@@ -24,6 +24,7 @@
 #include "browser.h"
 #include "tabview.h"
 #include <QWebEngineNavigationRequest>
+#include "bookmarklinkmodel.h"
 
 
 HtmlView::HtmlView(QSplitter *splitter, QWidget *parent, QWebEngineProfile *profile) : QWebEngineView(profile, parent), BaseView(splitter)
@@ -42,10 +43,33 @@ HtmlView::HtmlView(QSplitter *splitter, QWidget *parent, QWebEngineProfile *prof
     connect(this, &QWebEngineView::titleChanged, dynamic_cast<TabView*>(parent), &TabView::titleChanged);
     connect(this, &QWebEngineView::iconChanged, dynamic_cast<TabView*>(parent), &TabView::iconChanged);
     connect(this, &QWebEngineView::urlChanged, dynamic_cast<TabView*>(parent), &TabView::tabUrlChanged);
-    connect(this, &QWebEngineView::loadFinished, dynamic_cast<TabView*>(parent), &TabView::tabLoadFinished);
+    // connect(this, &QWebEngineView::loadFinished, dynamic_cast<TabView*>(parent), &TabView::tabLoadFinished);
     connect(this, &QWebEngineView::iconUrlChanged, dynamic_cast<TabView*>(parent), &TabView::tabIconUrlChanged);
     connect(this, &QWebEngineView::loadProgress, dynamic_cast<TabView*>(parent), &TabView::loadProgress);
     connect(this, &HtmlView::clickEmitted, dynamic_cast<TabView*>(parent), &TabView::navigationRequested);
+
+    connect(this, &QWebEngineView::loadFinished, this, [=](bool ok) {
+        if (ok) {
+            QString js = QStringLiteral("const metas = document.getElementsByTagName('meta');"
+                                        "var result='none';"
+                                        "for (let i = 0; i < metas.length; i++) {"
+                                        "  if (metas[i].getAttribute('name') === 'description') {"
+                                        "    result = metas[i].getAttribute('content');"
+                                        "    break;"
+                                        "  }"
+                                        "}"
+                                        "result;"
+                );
+
+            page()->runJavaScript(js, [=](const QVariant &v) {
+                m_description = v.toString();
+                emit dynamic_cast<TabView*>(parent)->tabLoadFinished(true);
+            });
+        } else {
+            emit dynamic_cast<TabView*>(parent)->tabLoadFinished(false);
+        }
+    });
+
 }
 
 HtmlView::~HtmlView()
@@ -97,6 +121,19 @@ const QString HtmlView::title()
 const QUrl HtmlView::iconUrl()
 {
     return QWebEngineView::iconUrl();
+}
+
+const QString HtmlView::description()
+{
+    return m_description;
+}
+
+bool HtmlView::addToBookmark()
+{
+    page()->runJavaScript("document.documentElement.outerHTML", [=](const QVariant &v) {
+        BookmarkLinkModel::addNewItem(title(), url(), iconUrl(), v.toString(), description());
+    });
+    return true;
 }
 
 void HtmlView::reload()

@@ -38,6 +38,8 @@ public:
 
     void connectTab(TabView *tabView);
 
+    void setBookmarkActive(bool isActive);
+
     QAction *historyBackAction;
     QAction *historyForwardAction;
     QAction *stopReloadAction;
@@ -45,6 +47,7 @@ public:
     UrlLineEdit *urlLineEdit;
 
     QAction *favAction;
+    QAction *bookmarkAction;
 
     QAction *newTabAction;
     QAction *newWindowAction;
@@ -52,6 +55,7 @@ public:
 
     QAction *historyAction;
     QAction *downloadsAction;
+    QAction *bookmarksAction;
 
     QAction *settingsAction;
 

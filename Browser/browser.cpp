@@ -30,7 +30,6 @@
 Browser::Browser()
 {
     HistoryItemModel::instance().fill(HistoryDb::list());
-    BookmarkItemModel::instance().fill(BookmarkDb::list());
 
     QObject::connect(QWebEngineProfile::defaultProfile(), &QWebEngineProfile::downloadRequested,
                      this, [=] (QWebEngineDownloadRequest *item) {

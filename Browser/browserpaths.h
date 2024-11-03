@@ -29,6 +29,7 @@ public:
 
     QLatin1String const static historyManagerName;
     QLatin1String const static downloadManagerName;
+    QLatin1String const static bookmarksManagerName;
     QLatin1String const static settingsManagerName;
     QLatin1String const static blankPageName;
     QLatin1String const static errorPageName;

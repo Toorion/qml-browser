@@ -18,7 +18,8 @@ SOURCES += \
     bookmarkdb.cpp \
     bookmarkitem.cpp \
     bookmarkitemmodel.cpp \
-    bookmarktreemodel.cpp \
+    bookmarklinkitem.cpp \
+    bookmarklinkmodel.cpp \
     document.cpp \
     downloadbutton.cpp \
     downloaddb.cpp \
@@ -45,7 +46,8 @@ HEADERS += \
     bookmarkdb.h \
     bookmarkitem.h \
     bookmarkitemmodel.h \
-    bookmarktreemodel.h \
+    bookmarklinkitem.h \
+    bookmarklinkmodel.h \
     document.h \
     downloadbutton.h \
     downloaddb.h \

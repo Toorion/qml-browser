@@ -38,6 +38,7 @@
 #include <QQuickStyle>
 #include <QQmlPropertyMap>
 #include "urlhelper.h"
+#include "bookmarklinkmodel.h"
 
 void messageHandler(QtMsgType type, const QMessageLogContext &context, const QString &msg)
 {
@@ -92,6 +93,8 @@ int main(int argc, char *argv[])
     QCoreApplication::setOrganizationName("QbqBrowser");
 
     MainApplication app(argc, argv);
+    app.setWindowIcon(QIcon::fromTheme("com.github.qml-browser", QIcon("qbqb3.png")));
+    app.setDesktopFileName("com.github.qml-browser");
 
     // Browser icons resource path
     QDir::addSearchPath("icons", BrowserPaths::iconsPath().toLocalFile());
@@ -124,6 +127,7 @@ int main(int argc, char *argv[])
     qRegisterMetaType<HistoryItemModel*>();
     qRegisterMetaType<BookmarkItem*>();
     qRegisterMetaType<BookmarkItemModel*>();
+    qRegisterMetaType<BookmarkLinkModel*>();
     qRegisterMetaType<DynamicObject*>();
     qRegisterMetaType<QQmlPropertyMap*>();
 

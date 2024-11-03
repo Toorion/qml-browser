@@ -21,7 +21,6 @@
 #include <QList>
 #include <QKeySequence>
 #include <QIcon>
-#include <QLineEdit>
 #include <QToolButton>
 #include <QMenu>
 #include <QShortcut>
@@ -35,6 +34,11 @@
 #include "urlhelper.h"
 #include "urllineedit.h"
 #include <QPushButton>
+#include "bookmarkdb.h"
+#include "QCompleter"
+#include "QTableView"
+#include "completermodel.h"
+#include "completerheader.h"
 
 NavigationBar::NavigationBar(QWidget *parent) : QToolBar(parent)
 {
@@ -132,36 +136,48 @@ NavigationBar::NavigationBar(QWidget *parent) : QToolBar(parent)
         if (activeTabView)
             activeTabView->navTyped(text);
     });
-
+    // urlLineEdit->setClearButtonEnabled(true);
     favAction = new QAction(this);
-    urlLineEdit->addAction(favAction, QLineEdit::LeadingPosition);
-    urlLineEdit->setClearButtonEnabled(true);
-    addWidget(urlLineEdit);
+    // favAction->setIcon(QIcon(QStringLiteral("icons:https_icon.svg"))); - todo
+    urlLineEdit->addAction(favAction, UrlLineEdit::LeadingPosition);
 
+    bookmarkAction = new QAction(this);
+    connect(bookmarkAction, &QAction::triggered, this, [=]() {
+        if (activeTabView) {
+            auto link = BookmarkDb::findLinkByLink(QUrl::fromUserInput(urlLineEdit->text()));
+            if(link) {
+                setBookmarkActive(!BookmarkDb::removeLink(link->id()));
+            } else {
+                setBookmarkActive(activeTabView->addToBookmark());
+            }
+        }
+    });
+    urlLineEdit->addAction(bookmarkAction, UrlLineEdit::TrailingPosition);
+    addWidget(urlLineEdit);
 
     /**
      * Bookmark
      */
-    QPushButton *bookmarkButton = new QPushButton(this);
-    bookmarkButton->setObjectName("BookmarkButton");
-    bookmarkButton->setToolTip(tr("Bookmark"));
-    bookmarkButton->setContextMenuPolicy(Qt::CustomContextMenu);
-    addWidget(bookmarkButton);
+    // QPushButton *bookmarkButton = new QPushButton(this);
+    // bookmarkButton->setObjectName("BookmarkButton");
+    // bookmarkButton->setToolTip(tr("Bookmark"));
+    // bookmarkButton->setContextMenuPolicy(Qt::CustomContextMenu);
+    // addWidget(bookmarkButton);
 
-    QMenu *bookmarkMenu=new QMenu(bookmarkButton);
-    //bookmarkButton->setMenu(bookmarkMenu);
+    // QMenu *bookmarkMenu=new QMenu(bookmarkButton);
+    // //bookmarkButton->setMenu(bookmarkMenu);
 
-    connect(bookmarkButton, &QPushButton::customContextMenuRequested, this, [this, bookmarkMenu, bookmarkButton]() {
-        QPoint globalPos = mapToGlobal(bookmarkButton->pos());
-        globalPos.setY(globalPos.ry() + bookmarkButton->height());
-        bookmarkMenu->popup(globalPos);
-    });
+    // connect(bookmarkButton, &QPushButton::customContextMenuRequested, this, [this, bookmarkMenu, bookmarkButton]() {
+    //     QPoint globalPos = mapToGlobal(bookmarkButton->pos());
+    //     globalPos.setY(globalPos.ry() + bookmarkButton->height());
+    //     bookmarkMenu->popup(globalPos);
+    // });
 
 
     // New tab
-    newTabAction = new QAction("New tab", this);
-    newTabAction->setShortcut(QKeySequence(Qt::CTRL | Qt::Key_T));
-    bookmarkMenu->addAction(newTabAction);
+    // newTabAction = new QAction("New tab", this);
+    // newTabAction->setShortcut(QKeySequence(Qt::CTRL | Qt::Key_T));
+    // bookmarkMenu->addAction(newTabAction);
 
 
     /**
@@ -211,6 +227,14 @@ NavigationBar::NavigationBar(QWidget *parent) : QToolBar(parent)
         tabView->loadUrl(INTERNAL_URL_SCHEME + "://" + BrowserPaths::downloadManagerName);
     });
 
+    // Bookmarks
+    bookmarksAction = new QAction("Bookmarks", this);
+    bookmarksAction->setShortcut(QKeySequence(Qt::CTRL | Qt::SHIFT | Qt::Key_O));
+    mainMenu->addAction(bookmarksAction);
+    connect(bookmarksAction, &QAction::triggered, this, [this](){
+        TabView *tabView = (qobject_cast<TabWidget*>(this->parent()))->createActiveTab();
+        tabView->loadUrl(INTERNAL_URL_SCHEME + "://" + BrowserPaths::bookmarksManagerName);
+    });
 
     mainMenu->addSeparator();
 
@@ -308,8 +332,17 @@ void NavigationBar::connectTab(TabView *tabView)
         activeTabView = tabView;
         connect(activeTabView, &TabView::urlChanged, this, &NavigationBar::changeUrl);
         connect(activeTabView, &TabView::loadProgress, this, &NavigationBar::handleLoadProgress);
-        changeUrl(activeTabView->getCurrentUrl());
+        changeUrl(activeTabView->currentUrl());
         urlLineEdit->setFocus();
+    }
+}
+
+void NavigationBar::setBookmarkActive(bool isActive)
+{
+    if(isActive) {
+        bookmarkAction->setIcon(QIcon(QStringLiteral("icons:star-a.svg")));
+    } else {
+        bookmarkAction->setIcon(QIcon(QStringLiteral("icons:star.svg")));
     }
 }
 
@@ -320,7 +353,7 @@ void NavigationBar::changeUrl(const QUrl url)
     historyForwardAction->setEnabled(activeTabView->historyForward.count() > 0);
     urlLineEdit->setText(url.toString());
     stopReloadAction->setEnabled(true);
-
+    setBookmarkActive(BookmarkDb::findLinkByLink(url));
 }
 
 void NavigationBar::handleLoadProgress(int progress)

@@ -50,9 +50,13 @@ public:
 
     const QUrl iconUrl() override;
 
+    const QString description() override;
+
     void navTyped(const QString &text) override {
         Q_UNUSED(text);
     };
+
+    bool addToBookmark() override;
 
 public Q_SLOTS:
     void reload() override;
@@ -72,6 +76,8 @@ private:
     QSplitter *layout;
 
     QWebEngineView *devView = nullptr;
+
+    QString m_description;
 
 };
 

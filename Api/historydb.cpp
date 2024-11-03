@@ -42,6 +42,7 @@ bool HistoryDb::create()
             "type int NOT NULL,"
             "title VARCHAR(1024) NOT NULL,"
             "icon_url VARCHAR(2048),"
+            "description VARCHAR(2048),"
             "added INTEGER NOT NULL"
             " )"
         )) {
@@ -57,12 +58,13 @@ int HistoryDb::insert(const HistoryItem &item)
 
     QSqlQuery query(p->m_db);
 
-    query.prepare("INSERT INTO " + p->m_tableName + " ( url, type, title, icon_url, added ) "
-                      "VALUES (:Url, :Type, :Title, :IconUrl, :Added)");
+    query.prepare("INSERT INTO " + p->m_tableName + " ( url, type, title, icon_url, description, added ) "
+                      "VALUES (:Url, :Type, :Title, :IconUrl, :Description, :Added)");
     query.bindValue(":Url",   item.url());
     query.bindValue(":Type",  item.type());
     query.bindValue(":Title",  item.title().isNull() ? QString("") : item.title());
     query.bindValue(":IconUrl",  item.iconUrl());
+    query.bindValue(":Description",  item.description());
     query.bindValue(":Added", item.added().toSecsSinceEpoch());
 
     if(!query.exec()){
@@ -81,12 +83,13 @@ bool HistoryDb::update(const HistoryItem &item)
 
     QSqlQuery query(p->m_db);
 
-    query.prepare("UPDATE " + p->m_tableName + " SET url=:Url, type=:Type, title=:Title, icon_url=:IconUrl, added=:Added WHERE id=:Id");
+    query.prepare("UPDATE " + p->m_tableName + " SET url=:Url, type=:Type, title=:Title, icon_url=:IconUrl, description=:Description, added=:Added WHERE id=:Id");
     query.bindValue(":Id",   item.id());
     query.bindValue(":Url",   item.url());
     query.bindValue(":Type",  item.type());
     query.bindValue(":Title",  item.title());
     query.bindValue(":IconUrl",  item.iconUrl());
+    query.bindValue(":Description",  item.description());
     query.bindValue(":Added", item.added().toSecsSinceEpoch());
 
     if(!query.exec()){
@@ -107,16 +110,54 @@ QList<HistoryItem *> HistoryDb::list()
     HistoryDb *p = gs_history_db();
 
     QList <HistoryItem*> list;
-    QSqlQuery query("SELECT id, url, type, title, icon_url, added FROM " + p->m_tableName + " ORDER BY added DESC", p->m_db);
+    QSqlQuery query("SELECT id, url, type, title, icon_url, description, added FROM " + p->m_tableName + " ORDER BY added DESC", p->m_db);
     while (query.next()) {
         // Url, Type
-        auto item = new HistoryItem(query.value(1).toString(), query.value(2).toInt(), query.value(3).toString(), query.value(4).toString());
+        auto item = new HistoryItem(query.value(1).toString(), query.value(2).toInt(), query.value(3).toString(), query.value(4).toString(), query.value(5).toString());
         // Id
-        item->setId(query.value(0).toString());
+        item->setId(query.value(0).toInt());
         auto time = new QDateTime();
         time->setSecsSinceEpoch(query.value(5).toInt());
         item->setAdded(*time);
         list << item;
     }
     return list;
+}
+
+QList<HistoryItem *> *HistoryDb::findByText(const QString &text)
+{
+    auto *p = gs_history_db();
+
+    QSqlQuery query("SELECT id, url, type, title, icon_url, description, added FROM url WHERE url LIKE ?", p->m_db);
+    query.addBindValue(QString("%%1%").arg(text));
+    if (!query.exec()) {
+        p->queryError(QLatin1String("url"), "select(find_text)", query.lastError().text());
+    }
+    auto list = new QList<HistoryItem*>();
+    while (query.next()) {
+        // Url, Type
+        auto item = new HistoryItem(query.value(1).toString(), query.value(2).toInt(), query.value(3).toString(), query.value(4).toString(), query.value(5).toString());
+        // Id
+        item->setId(query.value(0).toInt());
+        list->append(item);
+    }
+    return list;
+}
+
+HistoryItem *HistoryDb::findByUrl(const QUrl &url)
+{
+    auto *p = gs_history_db();
+
+    QSqlQuery query("SELECT id, url, type, title, icon_url, description, added FROM url WHERE url LIKE ?", p->m_db);
+    query.addBindValue(QString("%%1%").arg(url.toString()));
+    if (!query.exec()) {
+        p->queryError(QLatin1String("url"), "select(find_url)", query.lastError().text());
+    }
+    if(!query.first()) {
+        return nullptr;
+    }
+
+    auto item = new HistoryItem(query.value(1).toString(), query.value(2).toInt(), query.value(3).toString(), query.value(4).toString(), query.value(5).toString());
+    item->setId(query.value(0).toInt());
+    return item;
 }

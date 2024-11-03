@@ -24,6 +24,7 @@ Q_GLOBAL_STATIC(BrowserPaths, gs_browser_paths)
 
 QLatin1String const BrowserPaths::downloadManagerName = QLatin1String("downloads");
 QLatin1String const BrowserPaths::historyManagerName = QLatin1String("history");
+QLatin1String const BrowserPaths::bookmarksManagerName = QLatin1String("bookmarks");
 QLatin1String const BrowserPaths::settingsManagerName = QLatin1String("settings");
 QLatin1String const BrowserPaths::blankPageName = QLatin1String("blank");
 QLatin1String const BrowserPaths::errorPageName = QLatin1String("error");

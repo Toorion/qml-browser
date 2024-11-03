@@ -72,7 +72,21 @@ BookmarkItemModel *Qi::bookmarkModel()
     }
     QQmlEngine::setObjectOwnership(model, QQmlEngine::CppOwnership);
     return model;
+}
 
+BookmarkLinkModel *Qi::bookmarkLinkModel()
+{
+    ApiCommon *apiCommon = qobject_cast<ApiCommon*>(parent());
+
+    BookmarkLinkModel *model;
+    if(apiCommon->accessRights()->allowBookmark) {
+        model = &BookmarkLinkModel::instance();
+    } else {
+        apiCommon->log()->error("Access to bookmark deny");
+        model = new BookmarkLinkModel(this);
+    }
+    QQmlEngine::setObjectOwnership(model, QQmlEngine::CppOwnership);
+    return model;
 }
 
 QQmlPropertyMap *Qi::settingsModel()

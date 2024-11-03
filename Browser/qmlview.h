@@ -64,7 +64,11 @@ public:
 
     const QUrl iconUrl() override;
 
+    const QString description() override;
+
     void navTyped(const QString &text) override;
+
+    bool addToBookmark() override;
 
     void setInstallationUrl(QUrl *url) {
         m_installationUrl = url;
@@ -109,6 +113,8 @@ private:
     QString m_title;
 
     QUrl m_iconUrl;
+
+    QString m_description;
 
     void deepClean(const QObjectList list);
 

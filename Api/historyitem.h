@@ -27,14 +27,14 @@
 class API_EXPORT HistoryItem : public QObject
 {
     Q_OBJECT
-    Q_PROPERTY(QString id READ id CONSTANT)
+    Q_PROPERTY(int id READ id CONSTANT)
     Q_PROPERTY(QString iconUrl READ iconUrlString CONSTANT)
 
 public:
 
-    explicit HistoryItem(const QUrl &url, const int &type, const QString &title, const QUrl &iconUrl);
+    explicit HistoryItem(const QUrl &url, const int &type, const QString &title, const QUrl &iconUrl, const QString &description);
 
-    void setId(const QString id) {
+    void setId(const int id) {
         m_id = id;
     };
 
@@ -46,7 +46,7 @@ public:
         m_added = added;
     };
 
-    QString id() const {
+    int id() const {
         return m_id;
     }
 
@@ -66,6 +66,10 @@ public:
         return m_iconUrl;
     }
 
+    QString description() const {
+        return m_description;
+    }
+
     QString iconUrlString() const {
         return m_iconUrl.toString();
     }
@@ -76,7 +80,7 @@ public:
 
 private:
 
-    QString m_id;
+    int m_id;
 
     QUrl m_url;
 
@@ -87,6 +91,8 @@ private:
     QUrl m_iconUrl;
 
     QDateTime m_added;
+
+    QString m_description;
 
 };
 

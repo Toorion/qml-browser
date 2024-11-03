@@ -13,26 +13,18 @@ public:
     ~BookmarkItemModel();
     static BookmarkItemModel& instance(QObject *parent = nullptr);
 
-    enum ItemRoles {
-        IdxRole = Qt::UserRole + 1,
-        IdRole,
-        ParentIdRole,
-        NameRole,
-        ColorRole,
-        IconRole,
-        XRole,
-        YRole,
-        WidthRole,
-        HeightRole
-    };
+    void populate();
 
-    void fill(QList<BookmarkItem*> items);
+    uint appendChilds(const uint parentId, const QList<QVariantMap>* list, const uint depth);
 
-    Q_INVOKABLE BookmarkItem* create() {
-        return new BookmarkItem();
+    Q_INVOKABLE BookmarkItemModel* create() {
+        return new BookmarkItemModel();
     }
 
-    Q_INVOKABLE void addItem(BookmarkItem *item);
+    void addItem(BookmarkItem *item);
+
+    Q_INVOKABLE void add(const QVariantMap &data);
+    Q_INVOKABLE void insert(int row, const QVariantMap &data);
 
     void updateItem(BookmarkItem *item);
 

@@ -18,11 +18,12 @@
 ****************************************************************************/
 #include "historyitem.h"
 
-HistoryItem::HistoryItem(const QUrl &url, const int &type, const QString &title, const QUrl &iconUrl) :
+HistoryItem::HistoryItem(const QUrl &url, const int &type, const QString &title, const QUrl &iconUrl, const QString &description) :
     m_url(url),
     m_type(type),
     m_title(title),
-    m_iconUrl(iconUrl)
+    m_iconUrl(iconUrl),
+    m_description(description)
 {
     m_added = QDateTime::currentDateTime();
 }

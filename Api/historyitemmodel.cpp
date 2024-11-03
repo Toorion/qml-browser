@@ -60,11 +60,17 @@ QHash<int, QByteArray> HistoryItemModel::roleNames() const {
 
 void HistoryItemModel::addHistoryItem(HistoryItem *item)
 {
-    if(item->url().scheme() == INTERNAL_URL_SCHEME) {
+    if(!item->url().scheme().contains("http", Qt::CaseInsensitive)) {
+        return;
+    }
+    auto _item = HistoryDb::findByUrl(item->url());
+    if (_item != nullptr && _item->id() > 0) {
+        _item->setAdded(QDateTime::currentDateTime());
+        updateHistoryItem(_item);
         return;
     }
     int id = HistoryDb::insert(*item);
-    item->setId(QString::number(id));
+    item->setId(id);
     QModelIndex idx = QModelIndex();
     beginInsertRows(idx, 0, 0);
     m_items.prepend(item);
@@ -87,7 +93,7 @@ bool HistoryItemModel::removeHistoryItem(const qint64 index)
 {
     if(index >= 0 && index < m_items.count()) {
         beginRemoveRows(QModelIndex(), index, index);
-        HistoryDb::remove(m_items.at(index)->id().toInt());
+        HistoryDb::remove(m_items.at(index)->id());
         m_items.removeAt(index);
         endRemoveRows();
         emit layoutChanged(); // required for reindexing items

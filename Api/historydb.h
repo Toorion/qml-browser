@@ -38,6 +38,10 @@ public:
 
     QList<HistoryItem*> static list();
 
+    static QList<HistoryItem *> *findByText(const QString &text);
+
+    static HistoryItem *findByUrl(const QUrl &url);
+
 };
 
 #endif // HISTORYDB_H

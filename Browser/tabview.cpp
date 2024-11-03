@@ -146,6 +146,14 @@ void TabView::navTyped(const QString &text)
     }
 }
 
+bool TabView::addToBookmark()
+{
+    if(pageView()) {
+        return m_pageView->addToBookmark();
+    }
+    return false;
+}
+
 
 void TabView::tabUrlChanged(const QUrl url)
 {
@@ -159,7 +167,7 @@ void TabView::tabLoadFinished(bool ok)
         if(m_historyItem) {
             historyBack.push(m_historyItem);
         }
-        m_historyItem = new HistoryItem(m_currentUrl, m_pageView->viewType(), m_pageView->title(), m_pageView->iconUrl());
+        m_historyItem = new HistoryItem(m_currentUrl, m_pageView->viewType(), m_pageView->title(), m_pageView->iconUrl(), m_pageView->description());
         HistoryItemModel::instance().addHistoryItem(m_historyItem);
     }
 }
@@ -190,7 +198,7 @@ void TabView::back()
 {
     HistoryItem *historyItem = historyBack.pop();
     if(!m_currentUrl.isEmpty()) {
-        historyForward.push(new HistoryItem(m_currentUrl, m_pageView->viewType(), m_pageView->title(), m_pageView->iconUrl()));
+        historyForward.push(new HistoryItem(m_currentUrl, m_pageView->viewType(), m_pageView->title(), m_pageView->iconUrl(), m_pageView->description()));
     }
     setUrl(historyItem->url());
 }

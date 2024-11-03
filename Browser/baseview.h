@@ -52,11 +52,15 @@ public:
 
     virtual const QUrl iconUrl() = 0;
 
+    virtual const QString description() = 0;
+
     virtual int viewType() = 0;
 
     virtual void reload() = 0;
 
     virtual void navTyped(const QString &text) = 0;
+
+    virtual bool addToBookmark() = 0;
 
 protected:
 

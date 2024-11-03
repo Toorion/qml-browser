@@ -4,6 +4,7 @@
 #include <appdb.h>
 #include "Api_global.h"
 #include "bookmarkitem.h"
+#include "bookmarklinkitem.h"
 #include <QSqlQuery>
 
 class API_EXPORT BookmarkDb : public AppDb
@@ -13,16 +14,21 @@ public:
 
     bool create() override;
 
-    int static insert(const BookmarkItem &item);
+    static int insert(const BookmarkItem &item);
+    static int insertLink(const BookmarkLinkItem &item);
 
-    bool static update(const BookmarkItem &item);
+    static bool update(const BookmarkItem &item);
+    static bool updateLink(const BookmarkLinkItem &item);
 
-    bool static remove(const int id);
+    static bool remove(const int id);
+    static bool removeLink(const int id);
 
-    QList<BookmarkItem*> static list();
+    static QList<QVariantMap>* list();
+    static QList<QVariantMap>* listLinks();
 
-private:
-    bool bind(QSqlQuery *query, const BookmarkItem &item);
+    static BookmarkLinkItem *findLinkByLink(const QUrl &link);
+
+    static QList<BookmarkLinkItem *> *findLinkByText(const QString &text);
 };
 
 #endif // BOOKMARKDB_H

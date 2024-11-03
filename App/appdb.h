@@ -30,13 +30,17 @@ public:
     explicit AppDb();
 
     const QString dbFullName();
+    static const QVariantMap queryToMap(QSqlQuery *query);
+
     bool connect();
     bool open();
     void close();
     virtual bool create() = 0;
 
-    bool queryError(const QString operation, const QString query);
+    bool queryError(const QString command, const QString error);
+    bool queryError(const QLatin1String tableName, const QString command, const QString error);
     bool removeRecord(const int id);
+    bool removeRecord(const QLatin1String tableName, const int id);
 
     QLatin1String dbName;
 
@@ -51,6 +55,10 @@ protected:
     QLatin1String m_tableName;
 
     QSqlDatabase m_db;
+
+private:
+
+    static QMap<QLatin1String,QSqlDatabase*> m_dbs;
 
 };
 

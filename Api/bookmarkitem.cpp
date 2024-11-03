@@ -1,52 +1,55 @@
 #include "bookmarkitem.h"
+#include <QVariant>
 
-BookmarkItem::BookmarkItem(QObject *parent) : QObject{parent}
+BookmarkItem::BookmarkItem(QVariantMap data)
+    : m_itemData(std::move(data))
+{}
+
+const QList<QByteArray> BookmarkItem::fields()
 {
-
-}
-
-void BookmarkItem::appendChild(std::unique_ptr<BookmarkItem> &&child)
-{
-    m_childItems.push_back(std::move(child));
-}
-
-BookmarkItem *BookmarkItem::child(int row)
-{
-    return row >= 0 && row < childCount() ? m_childItems.at(row).get() : nullptr;
-}
-
-int BookmarkItem::childCount() const
-{
-    return int(m_childItems.size());
-}
-
-int BookmarkItem::columnCount() const
-{
-    // return int(m_itemData.count());
-    return 1;
+    return QList<QByteArray>{
+        "id",
+        "parentId",
+        "name",
+        "color",
+        "icon",
+        "idx",
+        "pin",
+        "expanded",
+        "depth",
+        "childsCount",
+        "visible",
+    };
 }
 
 QVariant BookmarkItem::data(int column) const
 {
-    return m_itemData.value(column);
+    return m_itemData.value(fields()[column]);
 }
 
-int BookmarkItem::row() const
+bool BookmarkItem::setData(int column, const QVariant &value)
 {
-    if (m_parentItem == nullptr)
-        return 0;
-    const auto it = std::find_if(m_parentItem->m_childItems.cbegin(), m_parentItem->m_childItems.cend(),
-                                 [this](const std::unique_ptr<BookmarkItem> &treeItem) {
-                                     return treeItem.get() == this;
-                                 });
-
-    if (it != m_parentItem->m_childItems.cend())
-        return std::distance(m_parentItem->m_childItems.cbegin(), it);
-    Q_ASSERT(false); // should not happen
-    return -1;
+    m_itemData[fields()[column]].setValue(value);
+    return true;
 }
 
-BookmarkItem *BookmarkItem::parentItem()
+QVariant BookmarkItem::value(const QByteArray &key) const
 {
-
+    return m_itemData.value(key);
 }
+
+void BookmarkItem::setValue(const QByteArray &key, const QVariant &value)
+{
+    m_itemData[key].setValue(value);
+}
+
+int BookmarkItem::id()
+{
+    return value("id").toUInt();
+}
+
+void BookmarkItem::setId(int id)
+{
+    setValue("id", id);
+}
+
