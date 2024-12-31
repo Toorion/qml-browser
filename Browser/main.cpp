@@ -39,6 +39,9 @@
 #include <QQmlPropertyMap>
 #include "urlhelper.h"
 #include "bookmarklinkmodel.h"
+#include <QCommandLineParser>
+
+
 
 void messageHandler(QtMsgType type, const QMessageLogContext &context, const QString &msg)
 {
@@ -71,16 +74,6 @@ void messageHandler(QtMsgType type, const QMessageLogContext &context, const QSt
 }
 
 
-QString commandLineUrlArgument()
-{
-    const QStringList args = QCoreApplication::arguments();
-    for (const QString &arg : args.mid(1)) {
-        if (!arg.startsWith(QLatin1Char('-')))
-               return arg;
-    }
-    return "";
-}
-
 
 int main(int argc, char *argv[])
 {
@@ -90,11 +83,21 @@ int main(int argc, char *argv[])
     // For linux required
     qputenv("QTWEBENGINE_CHROMIUM_FLAGS", "--no-sandbox") ;
 
-    QCoreApplication::setOrganizationName("QbqBrowser");
-
     MainApplication app(argc, argv);
+    QCoreApplication::setApplicationName("QbqBrowser");
+    QCoreApplication::setOrganizationName("QbqSoft");
     app.setWindowIcon(QIcon::fromTheme("com.github.qml-browser", QIcon("qbqb3.png")));
     app.setDesktopFileName("com.github.qml-browser");
+
+    QCommandLineParser parser;
+    parser.addPositionalArgument("url", "Starting url");
+    QCommandLineOption dataPathOption("d", "Browser data directory path", "path");
+    parser.addOption(dataPathOption);
+    parser.process(app);
+    const QStringList args = parser.positionalArguments();
+    QString dataPath = parser.value(dataPathOption);
+
+    AppPaths::init(dataPath);
 
     // Browser icons resource path
     QDir::addSearchPath("icons", BrowserPaths::iconsPath().toLocalFile());
@@ -141,9 +144,9 @@ int main(int argc, char *argv[])
         tmpView->deleteLater();
     });
 
-    QString rawUrl = commandLineUrlArgument();
-    if(rawUrl.isEmpty()) {
-        rawUrl = INTERNAL_URL_SCHEME + QLatin1String("://blank");
+    QString rawUrl(INTERNAL_URL_SCHEME + QLatin1String("://blank"));
+    if (args.size() > 0) {
+        rawUrl = args.at(0);
     }
     window->tabWidget->currentView()->loadUrl(rawUrl);
 

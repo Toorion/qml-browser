@@ -23,6 +23,10 @@ public:
     static bool remove(const int id);
     static bool removeLink(const int id);
 
+    static int count(QString const queryType, QVariantMap args);
+
+    static int update(QString const queryType, QVariantMap const args, QVariantMap const values);
+
     static QList<QVariantMap>* list();
     static QList<QVariantMap>* listLinks();
 

@@ -106,8 +106,8 @@ bool AppDb::removeRecord(const QLatin1String tableName, const int id)
 {
     QSqlQuery query(m_db);
 
-    query.prepare("DELETE FROM " + tableName + " WHERE id= :ID ;");
-    query.bindValue(":ID", id);
+    query.prepare("DELETE FROM " + tableName + " WHERE id=:id");
+    query.bindValue(":id", id);
 
     if(!query.exec()){
         return queryError(tableName, "remove", query.lastError().text());

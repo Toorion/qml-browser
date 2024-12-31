@@ -100,7 +100,7 @@ Item {
                         }
                         MenuItem {
                             text: "Remove from history"
-                            onTriggered: qi.visitHistoryModel().removeHistoryItem(row.idx)
+                            onTriggered: qi.visitHistoryModel().removeHistoryItem(index)
                         }
                     }
                 }
@@ -133,13 +133,8 @@ Item {
             spacing: 2
             Layout.fillWidth: true
             Layout.fillHeight: true
-            // model: qi.visitHistoryModel()
             model: delegateModel
-
-            
             onSearchTextChanged: delegateModel.update()
-
-            
             
             //ScrollBar.vertical: ScrollBar {
                 //id: verticalScrollBar

@@ -4,30 +4,36 @@ import QtQuick.Layouts
 import Qt.labs.platform
 
 Popup {
-    id: folderForm
-    width: 300;
-    height: 200
-    x: (parent.width - width) / 2
-    y: (parent.height - height) / 2
-    closePolicy: Popup.CloseOnEscape
-    modal: true
 
+    property string defaultFolderColor
     property int parentId
     property var model
     property var modelIndex
     property string formAction
+    property var treeView
 
-    function add(_model) {
+    id: folderForm
+    width: 300;
+    height: 200
+    x: (mainItem.width - width) / 2
+    y: (mainItem.height - height) / 2
+    closePolicy: Popup.CloseOnEscape
+    modal: true
+
+
+    function add(_parentId) {
+        parentId = _parentId;
+        itemName.text = "";
+        colorDialog.color = defaultFolderColor;
         formAction = "add";
-        model = _model;
         folderForm.open();
     }
 
     function edit(_model) {
-        formAction = "edit";
         model = _model;
         itemName.text = model.name;
-        colorDialog.color = model.color;
+        colorDialog.color = model.color ? model.color : defaultFolderColor;
+        formAction = "edit";
         folderForm.open();
     }
 
@@ -57,8 +63,8 @@ Popup {
         Label { text: "Color" }
         Rectangle {
             id: itemColor
-            width: 40
-            height: 40
+            implicitWidth: 40
+            implicitHeight: 40
             color: colorDialog.color
             MouseArea {
                 anchors.fill: parent
@@ -75,30 +81,25 @@ Popup {
             Button {
                 text: 'Cancel'
                 onClicked: {
-                    //console.log(qi.bookmarkModel().rowCount());
                     folderForm.close();
                 }
             }
 
             QbButton {
                 anchors.right: parent.right
-                //anchors.horizontalCenter: parent.horizontalCenter
-                //Layout.alignment: Qt.AlignRight
-                //x: parent.width
                 text: "Save"
                 onClick: function() {
                     var item;
-                    if(formAction === 'add') {
-                        qi.bookmarkModel().add({parentId: model.id, name: itemName.text});
+                    if(folderForm.formAction === 'add') {
+                        qi.bookmarkModel().add({parentId: parentId, name: itemName.text, color: itemColor.color, depth: 0, idx: 0});
                     } else {
                         model.name = itemName.text;
                         model.color = itemColor.color;
-                        qi.bookmarkTreeModel().submit();
+                        qi.bookmarkModel().save(model);
                     }
                     folderForm.close();
                 }
             }
         }
     }
-
 }

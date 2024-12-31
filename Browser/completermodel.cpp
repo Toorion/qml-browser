@@ -59,7 +59,7 @@ bool CompleterModel::applyFilter(const QString &text, const CompleterItem::Type 
     beginResetModel();
     m_items.clear();
 
-    if (text.length() > 0) {
+    if (text.length() > 2) {
         if (type == CompleterItem::Type::AllType || type == CompleterItem::Type::HistoryType) {
             auto hrows = HistoryDb::findByText(text);
             HistoryItem* hrow;

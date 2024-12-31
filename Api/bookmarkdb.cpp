@@ -55,6 +55,33 @@ bool BookmarkDb::create()
             )) {
         return queryError("create", query.lastError().text());
     }
+
+    if(!query.exec( "CREATE VIRTUAL TABLE link_idx USING fts5(text)")) {
+        return queryError("create", query.lastError().text());
+    }
+
+    if(!query.exec( "CREATE TRIGGER link_ai AFTER INSERT ON link BEGIN "
+                    "INSERT INTO link_idx(rowid, text) VALUES (new.id, new.text); "
+                    "END;"
+                    )) {
+        return queryError("trigger_insert", query.lastError().text());
+    }
+
+    if(!query.exec( "CREATE TRIGGER link_ad AFTER DELETE ON link BEGIN "
+                    "DELETE FROM link_idx WHERE rowid=old.rowid; "
+                    "END;"
+                    )) {
+        return queryError("trigger_insert", query.lastError().text());
+    }
+
+    if(!query.exec( "CREATE TRIGGER link_au AFTER UPDATE ON link BEGIN "
+                    "DELETE FROM link_idx WHERE rowid=old.rowid "
+                    "INSERT INTO link_idx(rowid, text) VALUES (new.id, new.text); "
+                    "END;"
+                    )) {
+        return queryError("trigger_insert", query.lastError().text());
+    }
+
     return true;
 }
 
@@ -151,14 +178,54 @@ bool BookmarkDb::removeLink(const int id)
     return p->removeRecord(QLatin1String("link"), id);
 }
 
+int BookmarkDb::count(const QString queryType, QVariantMap args)
+{
+    BookmarkDb *p = gs_bookmark_db();
+
+    QSqlQuery query(p->m_db);
+    if (queryType.compare("folder_links") == 0) {
+        query.prepare("SELECT COUNT(*) FROM link WHERE bookmarkId=:bookmarkId");
+        query.bindValue(":bookmarkId", args["bookmarkId"]);
+    }
+
+    if (!query.exec()) {
+        p->queryError(QLatin1String("link"), queryType, query.lastError().text());
+        return 0;
+    }
+
+    query.first();
+    return query.value(0).toInt();
+}
+
+int BookmarkDb::update(QString const queryType, const QVariantMap args, const QVariantMap values)
+{
+    BookmarkDb *p = gs_bookmark_db();
+    QSqlQuery query(p->m_db);
+
+    if (queryType.compare("move_links") == 0) {
+        query.prepare("UPDATE link SET bookmarkId=:newBookmarkId WHERE bookmarkId=:oldBookmarkId");
+        query.bindValue(":oldBookmarkId", args["bookmarkId"]);
+        query.bindValue(":newBookmarkId", values["bookmarkId"]);
+    }
+
+    if (!query.exec()) {
+        p->queryError(QLatin1String("link"), queryType, query.lastError().text());
+        return 0;
+    }
+
+    return query.numRowsAffected();
+}
+
 QList<QVariantMap>* BookmarkDb::list()
 {
     BookmarkDb *p = gs_bookmark_db();
 
-    QSqlQuery query("SELECT id, parentId, name, color, icon, idx, pin, expanded FROM " + p->m_tableName + " ORDER BY parentId, id", p->m_db);
+    QSqlQuery query("SELECT id, parentId, name, color, icon, idx, pin, expanded, links FROM bookmark LEFT JOIN (SELECT bookmarkId, COUNT(*) AS links FROM link GROUP BY bookmarkId) lnk ON lnk.bookmarkId = bookmark.id ORDER BY parentId, idx", p->m_db);
     auto list = new QList<QVariantMap>();
     while (query.next()) {
-        list->append(queryToMap(&query));
+        auto map = queryToMap(&query);
+        map["links"] = map.value("links", 0).toInt();
+        list->append(map);
     }
     return list;
 }
@@ -197,8 +264,19 @@ QList<BookmarkLinkItem*> *BookmarkDb::findLinkByText(const QString &text)
 {
     auto *p = gs_bookmark_db();
 
-    QSqlQuery query("SELECT * FROM link WHERE link LIKE ?", p->m_db);
+    QSqlQuery queryIdx("SELECT rowid FROM link_idx(?)", p->m_db);
+    queryIdx.addBindValue(QString("%1").arg(text));
+    if (!queryIdx.exec()) {
+        p->queryError(QLatin1String("link"), "select(find_text_fs5)", queryIdx.lastError().text());
+    }
+    auto rows = QStringList();
+    while (queryIdx.next()) {
+        rows << queryIdx.value(0).toString();
+    }
+
+    QSqlQuery query("SELECT * FROM link WHERE link LIKE ? OR id IN (?)", p->m_db);
     query.addBindValue(QString("%%1%").arg(text));
+    query.addBindValue(QString("%2").arg(rows.join(",")));
     if (!query.exec()) {
         p->queryError(QLatin1String("link"), "select(find_text)", query.lastError().text());
     }

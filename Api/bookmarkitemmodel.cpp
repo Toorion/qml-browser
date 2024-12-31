@@ -22,28 +22,12 @@ BookmarkItemModel::~BookmarkItemModel()
 void BookmarkItemModel::populate()
 {
     m_items.clear();
-    appendChilds(0, BookmarkDb::list(), 0);
-}
-
-uint BookmarkItemModel::appendChilds(const uint parentId, const QList<QVariantMap> *list, const uint depth)
-{
-    uint childsCount = 0;
+    auto list =  BookmarkDb::list();
     for (int i = 0; i < list->size(); i++) {
         auto row = list->at(i);
-        if (row.value("parentId").toUInt() != parentId) {
-            continue;
-        }
-        BookmarkItem* item = new BookmarkItem(row);
-        m_items.append(item);
-        item->setValue("childsCount", appendChilds(item->id(), list, depth + 1));
-        item->setValue("depth", depth);
-        item->setValue("expanded", false);
-        item->setValue("visible", depth == 0);
-        childsCount++;
+        m_items.append(new BookmarkItem(row));
     }
-    return childsCount;
 }
-
 
 QHash<int, QByteArray> BookmarkItemModel::roleNames() const {
     QHash<int, QByteArray> roles;
@@ -52,7 +36,6 @@ QHash<int, QByteArray> BookmarkItemModel::roleNames() const {
     }
     return roles;
 }
-
 
 void BookmarkItemModel::addItem(BookmarkItem *item)
 {
@@ -69,8 +52,33 @@ void BookmarkItemModel::add(const QVariantMap &data)
     auto item = new BookmarkItem(data);
     int id = BookmarkDb::insert(*item);
     item->setId(id);
-    beginInsertRows(QModelIndex(), m_items.size(), m_items.size());
-    m_items.append(item);
+    item->setValue("childsCount", 0);
+
+    int idx = 0;
+    int parentTo = item->value("parentId").toInt();
+    if (parentTo > 0) {
+        for (int i = 0; i< m_items.size(); i ++) {
+            auto row = m_items.at(i);
+            if (row->value("id").toInt() == parentTo) {
+                idx = i;
+                m_items.at(i)->setValue("childsCount", row->value("childsCount").toInt()+1);
+                emit dataChanged(createIndex(0,0), createIndex(m_items.size() - 1, 0), QList{Qt::UserRole + 10});
+            } else {
+                if (idx > 0) {
+                    idx = i;
+                    if (row->value("parentId").toInt() != parentTo) {
+                        break;
+                    }
+                }
+            }
+        }
+        beginInsertRows(QModelIndex(), idx, idx);
+        m_items.insert(idx, item);
+    } else {
+        beginInsertRows(QModelIndex(), m_items.size(), m_items.size());
+        m_items.append(item);
+    }
+
     endInsertRows();
 }
 
@@ -129,9 +137,6 @@ bool BookmarkItemModel::setData(const QModelIndex &index, const QVariant &value,
 
     BookmarkItem *item = m_items[index.row()];
     item->setData(role - Qt::UserRole - 1, value);
-
-    m_changedRow = index.row();
-
     emit dataChanged(index, index, { role } );
 
     return true ;
@@ -149,7 +154,42 @@ QVariantMap BookmarkItemModel::get(int row) const {
     return map;
 }
 
-void BookmarkItemModel::save() const
+void BookmarkItemModel::save(const QVariantMap &data)
 {
-    BookmarkDb::update(*m_items[m_changedRow]);
+    int id = data.value("id").toInt();
+    BookmarkItem *item = new BookmarkItem(data);
+    if (id > 0) {
+        for (int i = 0; i < m_items.count(); i++) {
+            if (m_items.at(i)->id() == id) {
+                m_items.replace(i, item);
+                BookmarkDb::update(*item);
+                return;
+            }
+        }
+    }
+
+    BookmarkDb::insert(*item);
+}
+
+void BookmarkItemModel::remove(const int id)
+{
+    BookmarkDb::remove(id);
+    for (int i = 0; i< m_items.size(); i ++) {
+        if (m_items.at(i)->id() == id) {
+            removeItem(i);
+            return;
+        }
+    }
+}
+
+bool BookmarkItemModel::setProperty(const int idx, const QString name, const QVariant value)
+{
+    QHash<int, QByteArray> roles = roleNames();
+    for (auto i = roles.cbegin(), end = roles.cend(); i != end; ++i) {
+        if (name.compare(i.value()) == 0) {
+            setData(createIndex(idx,0), value, i.key());
+            return true;
+        }
+    }
+    return false;
 }

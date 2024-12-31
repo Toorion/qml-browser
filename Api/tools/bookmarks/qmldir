@@ -5,3 +5,4 @@ MomentumAnimation ../common/MomentumAnimation.qml
 ResizableBox ../common/ResizableBox.qml
 FolderForm FolderForm.qml
 LinksView LinksView.qml
+FoldersView FoldersView.qml

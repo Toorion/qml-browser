@@ -128,8 +128,10 @@ QList<HistoryItem *> *HistoryDb::findByText(const QString &text)
 {
     auto *p = gs_history_db();
 
-    QSqlQuery query("SELECT id, url, type, title, icon_url, description, added FROM url WHERE url LIKE ?", p->m_db);
+    QSqlQuery query("SELECT id, url, type, title, icon_url, description, added FROM url WHERE url LIKE ? OR title LIKE ? OR description LIKE ?", p->m_db);
     query.addBindValue(QString("%%1%").arg(text));
+    query.addBindValue(QString("%%2%").arg(text));
+    query.addBindValue(QString("%%3%").arg(text));
     if (!query.exec()) {
         p->queryError(QLatin1String("url"), "select(find_text)", query.lastError().text());
     }

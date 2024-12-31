@@ -38,3 +38,25 @@ QString Tools::bytesToText(double bytes)
     }
     return QString("");
 }
+
+QVariantMap Tools::QJSValueToMap(QJSValue obj)
+{
+    QVariantMap map;
+
+    // JS Object
+    if(obj.prototype().hasOwnProperty("__proto__")) {
+        QJSValueIterator it(obj);
+        while (it.hasNext()) {
+            it.next();
+            map.insert(it.name(), it.value().toVariant());
+        }
+    } else { // QAbstractItemModel
+        QJSValueIterator it(obj.prototype());
+        while (it.hasNext()) {
+            it.next();
+            map.insert(it.name(), obj.property(it.name()).toVariant());
+        }
+    }
+
+    return map;
+}

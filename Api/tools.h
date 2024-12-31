@@ -21,6 +21,8 @@
 
 #include <QObject>
 #include "Api_global.h"
+#include <QVariantList>
+#include <QJSValueIterator>
 
 class API_EXPORT Tools
 {
@@ -28,6 +30,8 @@ public:
     Tools();
 
     QString static bytesToText(double bytes);
+
+    QVariantMap static QJSValueToMap(QJSValue obj);
 };
 
 #endif // TOOLS_H

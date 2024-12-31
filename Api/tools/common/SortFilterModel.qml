@@ -12,7 +12,7 @@ DelegateModel {
             items.setGroups(0, items.count, "items");
         }
 
-        // Step 1: Filter items
+        // Filter items
         let visible = [];
         let item;
         for (let i = 0; i < items.count; ++i) {
@@ -22,12 +22,12 @@ DelegateModel {
             }
         }
 
-        // Step 2: Sort the list of visible items
-        //visible.sort(function(a, b) {
-            //return lessThan(a.model, b.model) ? -1 : 1;
-        //});
+        // Sort the list of visible items
+        visible.sort(function(a, b) {
+            return lessThan(a.model, b.model) ? -1 : 1;
+        });
 
-        // Step 3: Add all items to the visible group:
+        // Add all items to the visible group:
         for (let i = 0; i < visible.length; ++i) {
             item = visible[i];
             item.inVisible = true;
@@ -35,6 +35,10 @@ DelegateModel {
                 visibleItems.move(item.visibleIndex, i, 1);
             }
         }
+    }
+
+    function modelByIndex(idx) {
+        return model.get(idx);
     }
 
     items.onChanged: update()

@@ -45,18 +45,18 @@ QmlView::QmlView(QSplitter *splitter, QWidget *parent)
     : QWidget(parent)
     , BaseView(splitter)
 {
-    m_quickView = new QQuickView(&m_qmlEngine, qobject_cast<QWindow*>(window()));
-    m_quickView->setResizeMode(QQuickView::SizeRootObjectToView);
+    m_quickView = new QQuickWidget(&m_qmlEngine, parent);
+    m_quickView->setResizeMode(QQuickWidget::SizeRootObjectToView);
 
     // Required for quick3d, but conflict with some datavisualisation which depends on OpenGL 2.1
     m_quickView->setFormat(QQuick3D::idealSurfaceFormat());
 
-    m_container = QWidget::createWindowContainer(m_quickView, this, Qt::Widget);
+    //m_container = QWidget::createWindowContainer(m_quickView, this, Qt::Widget);
 
     auto layout = new QVBoxLayout();
     layout->setContentsMargins(0, 0, 0, 0);
     layout->setSpacing(0);
-    layout->addWidget(m_container);
+    layout->addWidget(m_quickView);
     setLayout(layout);
 
     m_networkManagerFactory.setUserAgent(browserSettings->appUserAgent());
@@ -243,7 +243,7 @@ qreal QmlView::zoomFactor()
 void QmlView::setZoomFactor(const qreal factor)
 {
     m_contentItem->setScale(factor);
-    m_contentItem->setHeight(m_container->height() * 1.2);
+    m_contentItem->setHeight(m_quickView->height() * 1.2);
 }
 
 

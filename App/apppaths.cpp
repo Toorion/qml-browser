@@ -28,11 +28,43 @@ Q_GLOBAL_STATIC(AppPaths, gs_app_paths)
 
 AppPaths::AppPaths()
 {
-    init();
 }
 
 AppPaths::~AppPaths()
 {
+}
+
+void AppPaths::init(const QString &dataPath)
+{
+    AppPaths* p = gs_app_paths();
+
+    QString appPath = QCoreApplication::applicationDirPath();
+    if (!appPath.endsWith(QLatin1Char('/')))
+        appPath.append(QLatin1Char('/'));
+    p->m_appPath = QUrl::fromLocalFile(appPath);
+
+#ifndef Q_OS_WIN
+    p->m_appPath = p->m_appPath.resolved(QUrl(".."));
+#endif
+
+    p->m_currentProfilePath = QStandardPaths::writableLocation(QStandardPaths::AppConfigLocation);
+    p->m_downloadPath = QStandardPaths::writableLocation(QStandardPaths::DownloadLocation);
+
+    if (dataPath == nullptr) {
+        p->m_dataPath = QUrl::fromLocalFile(QStandardPaths::writableLocation(QStandardPaths::AppDataLocation));
+        if (p->m_dataPath.isEmpty()) qFatal("Cannot determine settings storage location");
+    } else {
+        p->m_dataPath = dataPath;
+    }
+
+    QDir dataDir(p->m_dataPath.toLocalFile());
+    if(!dataDir.mkpath(dataDir.absolutePath())) {
+        qFatal("wrong dataPath");
+    }
+
+    p->m_cachePath = QStandardPaths::writableLocation(QStandardPaths::CacheLocation);
+    if (!p->m_cachePath.endsWith(QLatin1Char('/')))
+        p->m_cachePath += QLatin1Char('/');
 }
 
 QString AppPaths::rootPath()
@@ -119,28 +151,3 @@ QUrl AppPaths::dappPath(const QUrl &internalUrl)
     return dappsPath().resolved(internalUrl);
 }
 
-void AppPaths::init()
-{
-    QString appPath = QCoreApplication::applicationDirPath();
-    if (!appPath.endsWith(QLatin1Char('/')))
-        appPath.append(QLatin1Char('/'));
-    m_appPath = QUrl::fromLocalFile(appPath);
-
-#ifndef Q_OS_WIN
-    m_appPath = m_appPath.resolved(QUrl(".."));
-#endif
-
-    m_currentProfilePath = QStandardPaths::writableLocation(QStandardPaths::AppConfigLocation);
-    m_downloadPath = QStandardPaths::writableLocation(QStandardPaths::DownloadLocation);
-
-    m_dataPath = QUrl::fromLocalFile(QStandardPaths::writableLocation(QStandardPaths::AppDataLocation));
-    if (m_dataPath.isEmpty()) qFatal("Cannot determine settings storage location");
-    QDir dataDir(m_dataPath.toLocalFile());
-    if(!dataDir.mkpath(dataDir.absolutePath())) {
-        qFatal("wrong dataPath");
-    }
-
-    m_cachePath = QStandardPaths::writableLocation(QStandardPaths::CacheLocation);
-    if (!m_cachePath.endsWith(QLatin1Char('/')))
-        m_cachePath += QLatin1Char('/');
-}

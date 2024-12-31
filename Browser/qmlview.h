@@ -22,10 +22,9 @@
 #include <QWidget>
 #include <QQmlComponent>
 #include <QUrl>
-#include <baseview.h>
-#include <QQuickView>
+#include "baseview.h"
 #include <QLayout>
-#include <QQuickItem>
+#include <QQuickWidget>
 #include <QSplitter>
 #include "qmldevtools.h"
 #include <QQmlEngine>
@@ -94,13 +93,13 @@ private:
 
     QQmlEngine m_qmlEngine;
 
-    QWidget *m_container;
+    //QWidget *m_container;
 
     QQmlComponent *m_component;
 
     QUrl m_url;
 
-    QQuickView *m_quickView;
+    QQuickWidget *m_quickView;
 
     QQmlContext *m_context;
 

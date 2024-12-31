@@ -87,6 +87,28 @@ bool BookmarkLinkModel::removeItem(const qint64 index)
     return false;
 }
 
+int BookmarkLinkModel::count(const QString queryType, const QVariantMap args)
+{
+    return BookmarkDb::count(queryType, args);
+}
+
+int BookmarkLinkModel::updateLinksBookmark(const int oldBookmarkId, const int newBookmarkId)
+{
+    int rows = BookmarkDb::update("move_links", QVariantMap{{"bookmarkId", oldBookmarkId}}, QVariantMap{{"bookmarkId", newBookmarkId}});
+    if (rows > 0) {
+        beginResetModel();
+        for( int i=0; i<m_items.count(); i++) {
+            auto item = m_items.at(i);
+            if (item->value("bookmarkId") == oldBookmarkId) {
+                item->setValue("bookmarkId", newBookmarkId);
+                m_items.replace(i, item);
+            }
+        }
+        endResetModel();
+    }
+}
+
+
 int BookmarkLinkModel::rowCount(const QModelIndex &parent) const
 {
     return m_items.count();
@@ -129,9 +151,22 @@ QVariantMap BookmarkLinkModel::get(int row) const
     return map;
 }
 
-void BookmarkLinkModel::save() const
+void BookmarkLinkModel::save(const QVariantMap &data)
 {
-    BookmarkDb::updateLink(*m_items[m_changedRow]);
+    int id = data.value("id").toInt();
+    BookmarkLinkItem *item = new BookmarkLinkItem(data);
+    if (id > 0) {
+        for (int i = 0; i < m_items.count(); i++) {
+            if (m_items.at(i)->id() == id) {
+                m_items.replace(i, item);
+                BookmarkDb::updateLink(*item);
+                return;
+            }
+        }
+    }
+
+    BookmarkDb::insertLink(*item);
+
 }
 
 QHash<int, QByteArray> BookmarkLinkModel::roleNames() const

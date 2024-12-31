@@ -19,6 +19,7 @@ const QList<QByteArray> BookmarkItem::fields()
         "depth",
         "childsCount",
         "visible",
+        "links"
     };
 }
 

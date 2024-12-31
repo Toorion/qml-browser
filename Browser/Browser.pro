@@ -1,4 +1,4 @@
-QT += core gui network widgets widgets-private quick webenginewidgets sql quickcontrols2 quick3d
+QT += core gui network widgets widgets-private quick webenginewidgets sql quickcontrols2 quick3d quickwidgets
 
 CONFIG += c++11 # ordered
 CONFIG -= debug_and_release

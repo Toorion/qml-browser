@@ -15,12 +15,6 @@ public:
 
     void populate();
 
-    uint appendChilds(const uint parentId, const QList<QVariantMap>* list, const uint depth);
-
-    Q_INVOKABLE BookmarkItemModel* create() {
-        return new BookmarkItemModel();
-    }
-
     void addItem(BookmarkItem *item);
 
     Q_INVOKABLE void add(const QVariantMap &data);
@@ -28,7 +22,7 @@ public:
 
     void updateItem(BookmarkItem *item);
 
-    Q_INVOKABLE bool removeItem(qint64 const index);
+    bool removeItem(qint64 const index);
 
     int rowCount(const QModelIndex & parent = QModelIndex()) const override;
 
@@ -38,17 +32,21 @@ public:
 
     Q_INVOKABLE QVariantMap get(int row) const;
 
-    Q_INVOKABLE void save() const;
+    Q_INVOKABLE void save(const QVariantMap &data);
 
-protected:
+    Q_INVOKABLE void remove(const int id);
+
+    Q_INVOKABLE bool setProperty(const int idx, const QString name, const QVariant value);
+
     QHash<int,QByteArray> roleNames() const override;
+protected:
+
 private:
     BookmarkItemModel(const BookmarkItemModel&other);
     BookmarkItemModel& operator=(const BookmarkItemModel&other);
 
     QList<BookmarkItem*> m_items;
 
-    int m_changedRow = 0;
 };
 
 #endif // BOOKMARKITEMMODEL_H

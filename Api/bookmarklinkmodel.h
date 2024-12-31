@@ -23,6 +23,10 @@ public:
 
     Q_INVOKABLE bool removeItem(qint64 const index);
 
+    Q_INVOKABLE int count(QString const queryType, QVariantMap const args);
+
+    Q_INVOKABLE int updateLinksBookmark(int const oldBookmarkId, int const newBookmarkId);
+
     int rowCount(const QModelIndex & parent = QModelIndex()) const override;
 
     QVariant data(const QModelIndex & index, int role = Qt::DisplayRole) const override;
@@ -31,7 +35,7 @@ public:
 
     Q_INVOKABLE QVariantMap get(int row) const;
 
-    Q_INVOKABLE void save() const;
+    Q_INVOKABLE void save(const QVariantMap &data);
 
 protected:
     QHash<int,QByteArray> roleNames() const override;

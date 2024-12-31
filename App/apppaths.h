@@ -31,6 +31,8 @@ public:
     explicit AppPaths();
     ~AppPaths();
 
+    void static init(const QString &dataPath);
+
     QString static rootPath();
 
     QUrl static resolved(const QString path);
@@ -64,7 +66,6 @@ public:
     QString const dappsDir = QLatin1String("dapps/");
 
 private:
-    void init();
 
     QUrl m_appPath;
 

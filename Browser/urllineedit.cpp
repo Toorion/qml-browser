@@ -9,7 +9,7 @@ UrlLineEdit::UrlLineEdit(QWidget *parent) : QLineEdit(parent)
     installAction = new QAction(this);
     installAction->setIcon(QIcon(QStringLiteral("icons:download.svg")));
     installAction->setText("Insatll DAPP");
-/*
+
     m_completer = new QCompleter(this);
     m_completerModel = new CompleterModel(this);
     m_completer->setModel(m_completerModel);
@@ -47,7 +47,7 @@ UrlLineEdit::UrlLineEdit(QWidget *parent) : QLineEdit(parent)
     connect(m_completer, static_cast<void (QCompleter::*)(const QModelIndex&)>(&QCompleter::activated), [=](const QModelIndex& index) {
         emit returnPressed();
     });
-*/
+
 }
 
 void UrlLineEdit::contextMenuEvent(QContextMenuEvent *event)
