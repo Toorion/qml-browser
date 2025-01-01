@@ -79,7 +79,6 @@ int main(int argc, char *argv[])
 {
     qInstallMessageHandler(&messageHandler);
 
-    //qputenv("QTWEBENGINE_CHROMIUM_FLAGS", "--disable-gpu --no-sandbox") ;
     // For linux required
     qputenv("QTWEBENGINE_CHROMIUM_FLAGS", "--no-sandbox") ;
 
@@ -109,7 +108,6 @@ int main(int argc, char *argv[])
 
     QWebEngineProfile::defaultProfile()->settings()->setAttribute(QWebEngineSettings::PluginsEnabled, true);
     QWebEngineProfile::defaultProfile()->settings()->setAttribute(QWebEngineSettings::JavascriptCanOpenWindows, false);
-    // todo - disable this: QWebEngineSettings::LocalStorageEnabled
     QWebEngineProfile::defaultProfile()->settings()->setAttribute(QWebEngineSettings::DnsPrefetchEnabled, true);
 
     // Settings
@@ -133,16 +131,6 @@ int main(int argc, char *argv[])
     qRegisterMetaType<BookmarkLinkModel*>();
     qRegisterMetaType<DynamicObject*>();
     qRegisterMetaType<QQmlPropertyMap*>();
-
-
-    /*
-     * Important! Qt6 Hook - QWebEngine should be initialized before any windowContainer!
-     */
-    QWebEngineView *tmpView = new QWebEngineView(window);
-    tmpView->setContent(QByteArray());
-    QTimer::singleShot(1000, [=](){
-        tmpView->deleteLater();
-    });
 
     QString rawUrl(INTERNAL_URL_SCHEME + QLatin1String("://blank"));
     if (args.size() > 0) {

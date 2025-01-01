@@ -77,6 +77,7 @@ bool CompleterModel::applyFilter(const QString &text, const CompleterItem::Type 
         }
     }
     endResetModel();
+    return true;
 }
 
 QString CompleterModel::typeName(const int &typeId)

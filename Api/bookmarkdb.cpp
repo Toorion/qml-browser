@@ -2,6 +2,7 @@
 #include <QSqlQuery>
 #include <QSqlError>
 #include <QUrl>
+#include <QRegularExpression>
 
 Q_GLOBAL_STATIC(BookmarkDb, gs_bookmark_db)
 
@@ -71,15 +72,15 @@ bool BookmarkDb::create()
                     "DELETE FROM link_idx WHERE rowid=old.rowid; "
                     "END;"
                     )) {
-        return queryError("trigger_insert", query.lastError().text());
+        return queryError("trigger_delete", query.lastError().text());
     }
 
     if(!query.exec( "CREATE TRIGGER link_au AFTER UPDATE ON link BEGIN "
-                    "DELETE FROM link_idx WHERE rowid=old.rowid "
+                    "DELETE FROM link_idx WHERE rowid=old.rowid; "
                     "INSERT INTO link_idx(rowid, text) VALUES (new.id, new.text); "
                     "END;"
                     )) {
-        return queryError("trigger_insert", query.lastError().text());
+        return queryError("trigger_update", query.lastError().text());
     }
 
     return true;
@@ -265,7 +266,9 @@ QList<BookmarkLinkItem*> *BookmarkDb::findLinkByText(const QString &text)
     auto *p = gs_bookmark_db();
 
     QSqlQuery queryIdx("SELECT rowid FROM link_idx(?)", p->m_db);
-    queryIdx.addBindValue(QString("%1").arg(text));
+    QString str(text);
+    str.replace(QRegularExpression("[^\\p{L}0-9 +*]"), " ");
+    queryIdx.addBindValue(QString("%1").arg(str));
     if (!queryIdx.exec()) {
         p->queryError(QLatin1String("link"), "select(find_text_fs5)", queryIdx.lastError().text());
     }

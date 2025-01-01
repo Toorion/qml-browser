@@ -30,7 +30,7 @@ git submodule update
 cd BROWSER_SRC/3rdparty/libgit2
 mkdir build && cd build
 cmake ..
-cmake --build .
+cmake --build . --config Release
 ```
 
 ### Linux

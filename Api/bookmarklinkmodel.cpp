@@ -106,6 +106,7 @@ int BookmarkLinkModel::updateLinksBookmark(const int oldBookmarkId, const int ne
         }
         endResetModel();
     }
+    return rows;
 }
 
 
