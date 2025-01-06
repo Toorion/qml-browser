@@ -51,8 +51,6 @@ QmlView::QmlView(QSplitter *splitter, QWidget *parent)
     // Required for quick3d, but conflict with some datavisualisation which depends on OpenGL 2.1
     m_quickView->setFormat(QQuick3D::idealSurfaceFormat());
 
-    //m_container = QWidget::createWindowContainer(m_quickView, this, Qt::Widget);
-
     auto layout = new QVBoxLayout();
     layout->setContentsMargins(0, 0, 0, 0);
     layout->setSpacing(0);

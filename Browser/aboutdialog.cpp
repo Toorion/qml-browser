@@ -18,7 +18,7 @@ AboutDialog::AboutDialog(QWidget* parent) : QDialog(parent)
     auto logoLabel = new QLabel(this);
 
     logoLabel->setTextFormat(Qt::RichText);
-    logoLabel->setText("<table><tr><td><img src=icons:qbqb.svg width=60 height=60></td><td style='padding-top:8px'><span style='height:1000px;font-size:40px;font-weight:bold;color:green;'>rowser</span></td></tr></table>");
+    logoLabel->setText("<table><tr><td><img src=icons:qbq256.png width=60 height=60></td><td style='padding-top:8px'><span style='height:1000px;font-size:40px;font-weight:bold;color:green;'>QbqBrowser</span></td></tr></table>");
     layout->addWidget(logoLabel, 0, Qt::AlignHCenter);
 
     QString gApiName("Unknown");

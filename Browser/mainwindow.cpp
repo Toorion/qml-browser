@@ -40,7 +40,7 @@ MainWindow::MainWindow(QWebEngineProfile *profile)
 {
     setObjectName("QUI-BrowserWindow");
 
-    QPixmap qbqb3("icons:qbqb3.svg");
+    QPixmap qbqb3("icons:qbq256.png");
     setWindowIcon(QIcon(qbqb3));
     setAttribute(Qt::WA_DeleteOnClose, true);
     setFocusPolicy(Qt::ClickFocus);

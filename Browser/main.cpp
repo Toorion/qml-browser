@@ -85,8 +85,6 @@ int main(int argc, char *argv[])
     MainApplication app(argc, argv);
     QCoreApplication::setApplicationName("QbqBrowser");
     QCoreApplication::setOrganizationName("QbqSoft");
-    app.setWindowIcon(QIcon::fromTheme("com.github.qml-browser", QIcon("qbqb3.png")));
-    app.setDesktopFileName("com.github.qml-browser");
 
     QCommandLineParser parser;
     parser.addPositionalArgument("url", "Starting url");
