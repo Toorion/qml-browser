@@ -2,16 +2,16 @@
 
 [![Donate](https://img.shields.io/badge/Donate-PayPal-green.svg)](https://paypal.me/toorion)
 
-QmlBrowser is full-featured Chromium based open-source web browser
-with QML SDAPPS (Serverless Decentralized Application) support.
+QmlBrowser is the next generation Web 3.0 browser with QML support, enabling the creation of SDAPPS (serverless decentralized applications) and PWAs (Progressive Web Apps)
 
-It is next generation of Web 3.0 browser.
+**Key features:**
 
-It use modern QML language to fill the pages with incredible features.
+* Accepts QML pages (modern QML language) in the same way as HTML
+* Unrestricted local storage per Web APP
+* Ability to install APP locally without being bound to a Web server.
+* An alternative security principle without the use of Cookies and CORS, which allows the application to interact with the Internet without restrictions.
+* Support for 3D functionality directly in the core
 
-It allow running QML pages/SDAPPS installed directly from Git or filesystem
-
-It support 3D functionality in the core and can render it fast on any hardware.
 
 ![QmlBrowser is full-featured Chromium based open-source web browser with QML pages support](preview.png)
 

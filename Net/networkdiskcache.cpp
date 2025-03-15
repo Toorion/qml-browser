@@ -19,7 +19,7 @@
 * This library baset on QT5 QNetworkDiskCache source code
 ****************************************************************************/
 
-//#define NETWORKDISKCACHE_DEBUG
+// #define NETWORKDISKCACHE_DEBUG
 
 #include "networkdiskcache.h"
 #include "networkdiskcache_p.h"
@@ -170,7 +170,7 @@ void NetworkDiskCache::insert(QIODevice *device)
 void NetworkDiskCachePrivate::storeItem(CacheItem *cacheItem)
 {
 #if defined(NETWORKDISKCACHE_DEBUG)
-    qDebug() << "NetworkDiskCachePrivate::storeItem()";
+    qDebug() << "NetworkDiskCachePrivate::storeItem()" << cacheItem->metaData.url();
 #endif
 
 //    Q_Q(NetworkDiskCache);
