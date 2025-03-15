@@ -99,7 +99,6 @@ Telegram: [@qmlbrowser](https://t.me/qmlbrowser)
 
 - SDAPPS manager
 - SDAPPS access controll
-- Bookmarks
 - Network adapter for QML mode
 - Expand API model for QML pages
 - IPFS Support
