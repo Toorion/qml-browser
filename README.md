@@ -2,12 +2,12 @@
 
 [![Donate](https://img.shields.io/badge/Donate-PayPal-green.svg)](https://paypal.me/toorion)
 
-QmlBrowser is the next generation Web 3.0 browser with QML support, enabling the creation of SDAPPS (serverless decentralized applications) and PWAs (Progressive Web Apps)
+QmlBrowser is the next generation Web 3.0 browser with QML support, enabling the creation of SDAPPS (serverless decentralized applications) and Hybrid Client
 
 **Key features:**
 
 * Accepts QML pages (modern QML language) in the same way as HTML
-* Unrestricted local storage per Web APP
+* Unrestricted local storage per APP
 * Ability to install APP locally without being bound to a Web server.
 * An alternative security principle without the use of Cookies and CORS, which allows the application to interact with the Internet without restrictions.
 * Support for 3D functionality directly in the core
