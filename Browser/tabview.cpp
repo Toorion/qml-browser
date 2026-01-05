@@ -70,14 +70,14 @@ void TabView::loadUrl(const QString &rawUrl)
 
 void TabView::installUrl(const QString &rawUrl)
 {
-    m_installationUrl = new QUrl(QUrl::fromUserInput(rawUrl));
-    if(m_installationUrl->isEmpty()) {
-        // todo: Goto error page
+    m_installationUrl = QUrl::fromUserInput(rawUrl);
+    if(m_installationUrl.isEmpty()) {
+        // TODO: show error page in the tab
         qWarning("Invalid URL");
         return;
     }
     if(DappInstaller::instance().proecessIsActive()) {
-        // todo: Goto error page
+        // TODO: show error page in the tab
         qWarning("Installation already in progress");
         return;
     }
@@ -126,8 +126,9 @@ void TabView::loadFinished()
     }
     if(UrlHelper::isLocalSource(m_reply->url())) {
         m_pageView->setContent(m_reply->readAll(), mimeType, m_reply->url());
-        if(m_installationUrl) {
+        if(!m_installationUrl.isEmpty()) {
           static_cast<QmlView*>(m_pageView)->setInstallationUrl(m_installationUrl);
+          m_installationUrl = QUrl();
         }
     } else {
         m_pageView->setUrl(m_reply->url());
