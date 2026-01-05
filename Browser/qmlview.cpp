@@ -192,19 +192,19 @@ void QmlView::continueLoad()
         emit loadFinished(true);
 
         // Start DAPP install
-        if(m_installationUrl) {
+        if(!m_installationUrl.isEmpty()) {
             m_dappInstaller = &DappInstaller::instance();
 
-            QUrl dappUrl = UrlHelper::gitToDappUrl(*m_installationUrl);
-            m_api->qi()->setProgressInfoProperty("url", QVariant::fromValue(m_installationUrl->toString()));
+            QUrl dappUrl = UrlHelper::gitToDappUrl(m_installationUrl);
+            m_api->qi()->setProgressInfoProperty("url", QVariant::fromValue(m_installationUrl.toString()));
             m_api->qi()->setProgressInfoProperty("dappUrl", QVariant::fromValue(dappUrl));
 
             connect(m_dappInstaller, &DappInstaller::progressChanged, m_api->qi(), &Qi::setProgress);
             connect(m_dappInstaller, &DappInstaller::progressOutput, m_api->qi(), [this](QString message){
                 m_api->log()->debug(message);
             });
-            m_dappInstaller->installOrUpdate(*m_installationUrl, UrlHelper::urlToLocalPath(dappUrl, true).toLocalFile());
-            m_installationUrl = nullptr;
+            m_dappInstaller->installOrUpdate(m_installationUrl, UrlHelper::urlToLocalPath(dappUrl, true).toLocalFile());
+            m_installationUrl = QUrl();
         }
     }
 
