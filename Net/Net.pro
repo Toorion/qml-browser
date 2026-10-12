@@ -51,6 +51,7 @@ win32 {
 unix {
     target.path = /usr/lib
     LIBS += -L$$PWD/../3rdparty/libgit2/build -lgit2
+    QMAKE_LFLAGS += -Wl,-rpath,$$PWD/../3rdparty/libgit2/build
 }
 !isEmpty(target.path): INSTALLS += target
 

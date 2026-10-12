@@ -20,6 +20,7 @@
 #include "urlhelper.h"
 #include "apppaths.h"
 #include <QFileInfo>
+#include <QDir>
 
 
 UrlHelper::UrlHelper()
@@ -36,7 +37,7 @@ bool UrlHelper::isLocalSource(const QUrl &url)
 
 QUrl UrlHelper::urlToLocalPath(const QUrl &url, bool toDir)
 {
-    if(url.isLocalFile()) {
+    if (url.isLocalFile()) {
         return url;
     } else if(url.scheme().compare(INTERNAL_URL_SCHEME) == 0) {
         return assertFilename(AppPaths::toolPath(url));
@@ -54,7 +55,7 @@ QUrl UrlHelper::urlToLocalPath(const QUrl &url, bool toDir)
 
 QUrl UrlHelper::assertFilename(const QUrl &url)
 {
-    if(!url.fileName().isEmpty()) {
+    if (!url.fileName().isEmpty()) {
         QFileInfo fi(url.toLocalFile());
         if(fi.isFile() && fi.exists()) {
             return url;
@@ -80,7 +81,7 @@ QUrl UrlHelper::assertFilename(const QUrl &url)
 
 QString UrlHelper::urlLocalPath(const QUrl &url)
 {
-    if(url.scheme().compare(INTERNAL_URL_SCHEME) == 0) {
+    if (url.scheme().compare(INTERNAL_URL_SCHEME) == 0) {
         return AppPaths::dataPath();
     } else if (url.scheme().compare(DAPP_URL_SCHEME) == 0) {
         return AppPaths::dappPath(url).toLocalFile();
@@ -90,7 +91,11 @@ QString UrlHelper::urlLocalPath(const QUrl &url)
 
 QString UrlHelper::urlLocalDataPath(const QUrl &url)
 {
-    if(url.scheme().compare(INTERNAL_URL_SCHEME) == 0) {
+    if (url.scheme().compare(LOCAL_URL_SCHEME) == 0) {
+        QString filePath = url.adjusted(QUrl::RemoveScheme | QUrl::StripTrailingSlash).toString().remove(0,2);
+        QFileInfo info(filePath);
+        return info.dir().path();
+    } else if (url.scheme().compare(INTERNAL_URL_SCHEME) == 0) {
         return AppPaths::toolPath(url).toLocalFile();
     } else if (url.scheme().compare(DAPP_URL_SCHEME) == 0) {
         return AppPaths::dappPath(url).toLocalFile();
@@ -104,7 +109,7 @@ QUrl UrlHelper::gitToDappUrl(const QUrl &url)
     u.setScheme(DAPP_URL_SCHEME);
     QStringList parts = url.path().split(DIR_SP, Qt::SkipEmptyParts);
     QString host = url.host();
-    if(parts.size() > 0) {
+    if (parts.size() > 0) {
         for(qsizetype i = 0; i < parts.size(); i++) {
             if(i == parts.size() - 1) {
                 host = parts[i].section(".",0,0) + '.' + host;

@@ -131,6 +131,7 @@ void QmlView::continueLoad()
     if(m_component->status() == QQmlComponent::Ready) {
 
         // set LocalStorage path per host / dapps
+        qDebug() << UrlHelper::urlLocalDataPath(m_url);
         m_qmlEngine.setOfflineStoragePath(UrlHelper::urlLocalDataPath(m_url));
 
         m_context = new QQmlContext(m_quickView->engine()->rootContext());

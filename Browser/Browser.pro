@@ -78,12 +78,14 @@ qnx: target.path = /tmp/$${TARGET}/bin
 else: unix:!android: target.path = /opt/$${TARGET}/bin
 !isEmpty(target.path): INSTALLS += target
 
-LIBS += -L$$OUT_PWD/../App/ -lApp
-LIBS += -L$$OUT_PWD/../Net/ -lNet
-LIBS += -L$$OUT_PWD/../Api/ -lApi
+LIB_BUILD_DIR = $$OUT_PWD/..
+LIBS += -L$$LIB_BUILD_DIR/App/ -lApp
+LIBS += -L$$LIB_BUILD_DIR/Net/ -lNet
+LIBS += -L$$LIB_BUILD_DIR/Api/ -lApi
 unix {
     target.path = /usr/lib
     LIBS += -L$$PWD/../3rdparty/libgit2/build -lgit2
+    QMAKE_LFLAGS += -Wl,-rpath,$$LIB_BUILD_DIR/App -Wl,-rpath,$$LIB_BUILD_DIR/Net -Wl,-rpath,$$LIB_BUILD_DIR/Api -Wl,-rpath,$$PWD/../3rdparty/libgit2/build
 }
 
 win32 {

@@ -139,7 +139,7 @@ QString AppPaths::webAppPath(const QUrl &url)
     QUrl cleanUrl;
     cleanUrl.setScheme(url.scheme());
     cleanUrl.setHost(url.host());
-
+    qDebug() << "HOST" << url.host();
     quint16 id = qChecksum(cleanUrl.toEncoded());
     QString strId = QString::number(id, 16);
 

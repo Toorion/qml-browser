@@ -23,6 +23,7 @@
 #include "Net_global.h"
 
 #define INTERNAL_URL_SCHEME QLatin1String("internal")
+#define LOCAL_URL_SCHEME QLatin1String("file")
 #define DAPP_URL_SCHEME QLatin1String("dapp")
 #define QML_MAIN_FILE QString("main.qml")
 #define HTML_MAIN_FILE QString("main.html")
