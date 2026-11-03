@@ -98,7 +98,7 @@ private:
 
     bool m_reload = false;
 
-    QUrl *m_installationUrl = nullptr;
+    QUrl m_installationUrl;
 
 };
 

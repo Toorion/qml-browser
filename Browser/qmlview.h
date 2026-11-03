@@ -69,7 +69,7 @@ public:
 
     bool addToBookmark() override;
 
-    void setInstallationUrl(QUrl *url) {
+    void setInstallationUrl(const QUrl &url) {
         m_installationUrl = url;
     };
 
@@ -121,7 +121,7 @@ private:
 
     bool m_reloading = false;
 
-    QUrl *m_installationUrl = nullptr;
+    QUrl m_installationUrl;
 
     DappInstaller *m_dappInstaller = nullptr;
 
