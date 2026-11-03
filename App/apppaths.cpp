@@ -139,11 +139,8 @@ QString AppPaths::webAppPath(const QUrl &url)
     QUrl cleanUrl;
     cleanUrl.setScheme(url.scheme());
     cleanUrl.setHost(url.host());
-    qDebug() << "HOST" << url.host();
-    quint16 id = qChecksum(cleanUrl.toEncoded());
-    QString strId = QString::number(id, 16);
 
-    return p->m_cachePath + strId.left(2) + DIR_SP + strId.right(2) + DIR_SP;
+    return p->m_cachePath + cleanUrl.host() + DIR_SP;
 }
 
 QUrl AppPaths::dappPath(const QUrl &internalUrl)
