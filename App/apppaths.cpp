@@ -140,7 +140,10 @@ QString AppPaths::webAppPath(const QUrl &url)
     cleanUrl.setScheme(url.scheme());
     cleanUrl.setHost(url.host());
 
-    return p->m_cachePath + cleanUrl.host() + DIR_SP;
+    QString host = cleanUrl.host();
+    host.replace(QRegularExpression("[^a-zA-Z0-9.-]"), "_");
+
+    return p->m_cachePath + host + DIR_SP;
 }
 
 QUrl AppPaths::dappPath(const QUrl &internalUrl)
