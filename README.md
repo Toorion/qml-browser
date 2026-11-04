@@ -22,29 +22,39 @@ Available on [Release](https://github.com/Toorion/qml-browser/releases) page
 
 ## Building
 
-Before build browser core libgit2 should be builded:
+The project uses **CMake** (qmake is deprecated).
 
-```sh
-git submodule init
-git submodule update
-cd BROWSER_SRC/3rdparty/libgit2
-mkdir build && cd build
-cmake ..
-cmake --build . --config Release
-```
+### Prerequisites
+- Qt 6.8+ (Qt 6.12 recommended)
+- CMake 3.16+
+- C++11 compatible compiler (GCC/Clang/MSVC)
 
 ### Linux
 ```sh
+# Initialize libgit2 submodule
+git submodule update --init --recursive
+
+# Configure and build
 mkdir build && cd build
-qmake ..
-make && make install
+cmake -DCMAKE_PREFIX_PATH=/path/to/Qt6 ..
+cmake --build . --config Release -j4
 ```
 
 ### Windows
+```cmd
+git submodule update --init --recursive
+mkdir build && cd build
+cmake -DCMAKE_PREFIX_PATH=C:\Qt\6.12.0\msvc2019_64 ..
+cmake --build . --config Release
+```
 
-Use QtCreator to build 
+Or open `CMakeLists.txt` in **QtCreator** (Qt 6.8+ kit) and build.
 
-Kit QT + MSVC2019
+### QtCreator Setup
+1. File → Open File or Project → Select `CMakeLists.txt`
+2. Select Kit: Qt 6.8+ (GCC/MSVC)
+3. Add CMake argument: `-DCMAKE_PREFIX_PATH=/path/to/Qt6`
+4. Build → Run
 
 ## Demo
 
