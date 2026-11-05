@@ -16,6 +16,7 @@ qt_add_library(Api SHARED
     downloaditemmodel.cpp
     downloadmanagerwidget.cpp
     dynamicobject.cpp
+    fetchapi.cpp
     historydb.cpp
     historyitem.cpp
     historyitemmodel.cpp
@@ -45,6 +46,7 @@ set(Api_headers
     downloaditemmodel.h
     downloadmanagerwidget.h
     dynamicobject.h
+    fetchapi.h
     historydb.h
     historyitem.h
     historyitemmodel.h

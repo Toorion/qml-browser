@@ -59,8 +59,30 @@ QmlView::QmlView(QSplitter *splitter, QWidget *parent)
 
     m_networkManagerFactory.setUserAgent(browserSettings->appUserAgent());
     m_quickView->engine()->setNetworkAccessManagerFactory(&m_networkManagerFactory);
-    m_api = new ApiWeb(&m_networkManagerFactory);
+    m_api = new ApiWeb(&m_networkManagerFactory, &m_qmlEngine);
     m_qmlEngine.globalObject().setProperty("log", m_qmlEngine.newQObject(m_api->log()));
+    
+    // Expose fetch globally for ES modules and QML
+    // Wrap the ApiWeb fetch method in a JS function
+    QJSValue apiObj = m_quickView->engine()->newQObject(m_api);
+    QJSValue fetchMethod = apiObj.property("fetch");
+    
+    if (fetchMethod.isCallable()) {
+        m_quickView->engine()->globalObject().setProperty("fetch", fetchMethod);
+    } else {
+        // Fallback: create wrapper function
+        QJSValue fetchWrapper = m_quickView->engine()->evaluate(
+            "(function(api) { "
+            "    return function fetch(url, options) { "
+            "        return api.fetch(url, options); "
+            "    }; "
+            "})"
+        ).call({apiObj});
+        m_quickView->engine()->globalObject().setProperty("fetch", fetchWrapper);
+    }
+    
+    // Also expose fetchApi for direct access
+    m_quickView->engine()->globalObject().setProperty("fetchApi", m_quickView->engine()->newQObject(m_api->fetchApi()));
 
     DownloadManagerWidget *downloadManager = (qobject_cast<MainWindow*>(window()))->downloadManagerWidget();
     m_api->qi()->setDownloadManagerWidget(downloadManager);
