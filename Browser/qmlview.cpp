@@ -40,7 +40,6 @@
 #include "bookmarklinkmodel.h"
 #include "browserpaths.h"
 
-//TODO: DAPP context should be passed by here
 
 QmlView::QmlView(QSplitter *splitter, QWidget *parent)
     : QWidget(parent)
