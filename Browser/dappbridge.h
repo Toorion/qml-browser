@@ -18,7 +18,6 @@ public:
 
     QStringList dapps() const { return m_dapps; }
 
-    Q_INVOKABLE void launchDapp(const QString& dappId);
     Q_INVOKABLE void refreshDapps();
 
 signals:

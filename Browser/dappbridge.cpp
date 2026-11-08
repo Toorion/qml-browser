@@ -11,11 +11,3 @@ void DappBridge::refreshDapps() {
     m_dapps = m_dappsDir.entryList();
     emit dappsChanged();
 }
-
-void DappBridge::launchDapp(const QString& dappId) {
-    QDir dappDir(m_dappsDir.filePath(dappId));
-    if (dappDir.exists()) {
-        // TODO
-    }
-}
-
