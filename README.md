@@ -40,7 +40,8 @@ qmake ..
 make && make install
 ```
 
-> [!NOTE] In some Linux distros, with Wayland, HTML webs aren't shown correctly. If this happens to you, reopen the session with X11 
+> [!NOTE]
+> In some Linux distros, with Wayland, HTML webs aren't shown correctly. If this happens to you, reopen the session with X11 
 
 ### Windows
 

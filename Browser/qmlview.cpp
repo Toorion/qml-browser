@@ -38,8 +38,9 @@
 #include "browsersettings.h"
 #include "urlhelper.h"
 #include "bookmarklinkmodel.h"
+#include "browserpaths.h"
 
-
+//TODO: DAPP context should be passed by here
 
 QmlView::QmlView(QSplitter *splitter, QWidget *parent)
     : QWidget(parent)
@@ -152,7 +153,16 @@ void QmlView::continueLoad()
 
         m_context->setContextObject(m_api);
 
+        if (m_url == INTERNAL_URL_SCHEME + "://" + BrowserPaths::dappManagerPageName) {
+            if (!m_bridge) m_bridge = new DappBridge(this);
+            m_context->setContextProperty("dappBridge", m_bridge);
+        }
+
         QObject *component = m_component->beginCreate(m_context);
+        if (!component) {
+            m_api->log()->error(tr("beginCreate() returned null for  %1").arg(m_url.toString()));
+            return;
+        }
         m_contentItem = qobject_cast<QQuickItem*>(component);
         if(!m_contentItem) {
             m_api->log()->error(tr("Wrong root object type [%1], instance of Item awaiting").arg(component->metaObject()->className()));

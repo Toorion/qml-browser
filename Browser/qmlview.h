@@ -34,6 +34,7 @@
 #include <QNetworkReply>
 #include "dappinstaller.h"
 #include "networkaccessmanagerfactory.h"
+#include "dappbridge.h"
 
 
 
@@ -95,13 +96,13 @@ private:
 
     //QWidget *m_container;
 
-    QQmlComponent *m_component;
+    QQmlComponent *m_component = nullptr;
 
     QUrl m_url;
 
-    QQuickWidget *m_quickView;
+    QQuickWidget *m_quickView = nullptr;
 
-    QQmlContext *m_context;
+    QQmlContext *m_context = nullptr;
 
     QQuickItem *m_contentItem = nullptr;
 
@@ -117,7 +118,7 @@ private:
 
     void deepClean(const QObjectList list);
 
-    QNetworkReply *m_reply;
+    QNetworkReply *m_reply = nullptr;
 
     bool m_reloading = false;
 
@@ -127,6 +128,7 @@ private:
 
     NetworkAccessManagerFactory m_networkManagerFactory;
 
+    DappBridge *m_bridge = nullptr;
 };
 
 #endif // QMLVIEW_H

@@ -12,7 +12,7 @@ Item {
         ListElement { name: "Basic" }
         ListElement { name: "Fusion" }
         ListElement { name: "Imagine" }
-        ListElement { name: "Material" }
+        ListElement { name: "Material" } //TODO: Add Material.accent if selected
         ListElement { name: "Universal" }
     }
     

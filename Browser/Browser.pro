@@ -18,6 +18,7 @@ SOURCES += \
     completerheader.cpp \
     completermodel.cpp \
     completerrow.cpp \
+    dappbridge.cpp \
     downloaditemproxy.cpp \
     htmlview.cpp \
     main.cpp \
@@ -41,6 +42,7 @@ HEADERS += \
     completerheader.h \
     completermodel.h \
     completerrow.h \
+    dappbridge.h \
     downloaditemproxy.h \
     htmlview.h \
     mainwindow.h \
